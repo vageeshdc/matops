@@ -142,7 +142,10 @@ out_1_end:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 add_mat_2d:
-	;arr A[],B[],n,C[]
+	;arr A[],B[],n,C[],ia,ja,ib,jb,Wid,ic,jc
+	;here  (ij) is the location of blocks A and B wrt to parent matrices
+	;Wid is the Width of parent matrix
+	;Work under assumption that it is a square
 
 	mov eax,[esp+12]
 	sub eax,1
@@ -157,24 +160,53 @@ out_2a:
 	;;addition logic
 	
 	;find offset
+	
+	;;A's offset
+	mov edx,[esp+20]
+	sub edx,1
+	imul edx,[esp+36]
+	add edx,[esp+24]
+	imul eds,4
+	mov [aOff],edx
+	
+	;;B's offset
+	mov edx,[esp+28]
+	sub edx,1
+	imul edx,[esp+36]
+	add edx,[esp+32]
+	imul eds,4
+	mov [bOff],edx
+	
+	;;C's offset
+	mov edx,[esp+40]
+	sub edx,1
+	imul edx,[esp+36]
+	add edx,[esp+44]
+	imul eds,4
+	mov [cOff],edx
+	
+	;common offset
 	mov ebx,[loop_i]
-	imul ebx,[esp+12]
+	imul ebx,[esp+36]
 	add ebx,[loop_j]
 	imul ebx,4
 
 	;get B[]
 	mov ecx,[esp+8]
 	add ecx,ebx
+	add ecx,[bOff]
 	mov eax,[ecx]
 
 	;add A[]
 	mov ecx,[esp+4]
 	add ecx,ebx
+	add ecx,[aOff]
 	add eax,[ecx]
 
 	;store to C[]
 	mov ecx,[esp+16]
 	add ecx,ebx
+	add ecx.[cOff]
 	mov [ecx],eax
 
 	;;end of addition
