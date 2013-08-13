@@ -1,0 +1,264 @@
+     1                                  ;assignment 1
+     2                                  ;CSD course
+     3                                  ;author: vageesh
+     4                                  ;
+     5                                  ;Info : a matrix multiplication implementation
+     6                                  
+     7                                  section .data
+     8 00000000 737570207468657265-     	msg: db "sup there",16
+     9 00000009 10                 
+    10                                  	len: equ $-msg
+    11                                  
+    12 0000000A 0C000000F3E0010013-     	arr: dd 12,123123,2323,454,234,3434,324
+    13 00000013 090000C6010000EA00-
+    14 0000001C 00006A0D0000440100-
+    15 00000025 00                 
+    16                                  	
+    17 00000026 010000000200000003-     	arr2: dd 1,2,3,4
+    18 0000002F 00000004000000     
+    19 00000036 000000000000000000-     	arr3: dd 0,0,0,0
+    20 0000003F 00000000000000     
+    21                                  
+    22 00000046 796F202564206E756D-     	format: db "yo %d num",10,0
+    23 0000004F 0A00               
+    24                                  	
+    25 00000051 00000000                	loop_i: dd 0
+    26 00000055 00000000                	loop_j: dd 0
+    27                                  	
+    28 00000059 00000000                	aVec: dd 0
+    29 0000005D 00000000                	bVec: dd 0
+    30                                  
+    31                                  section .text:
+    32                                  	global main
+    33                                  	extern printf
+    34                                  
+    35                                  main:
+    36                                  	;pop ebx
+    37                                  	;dec ebx
+    38                                  	;pop ebp
+    39                                  	;pop ebp
+    40                                  
+    41                                  	;mov edx,4
+    42                                  	;mov ecx,arr
+    43                                  	;mov ebx,1
+    44                                  	;mov eax,4
+    45                                  	;int 80h
+    46                                  
+    47 00000000 B8[36000000]                mov eax,arr3
+    48 00000005 50                          push eax
+    49                                  
+    50 00000006 B802000000              	mov eax,2
+    51 0000000B 50                      	push eax
+    52 0000000C B8[26000000]            	mov eax,arr2
+    53                                  
+    54 00000011 50                      	push eax
+    55 00000012 50                      	push eax
+    56                                  
+    57 00000013 E85C000000              	call mult_mat_2d
+    58                                  
+    59                                  	;lea eax,[arr]
+    60                                  	;mov ecx,[eax]
+    61                                  	;mov eax,[arr + 4]
+    62                                  	;pop eax
+    63                                  	;push eax
+    64                                  	
+    65                                  	;push format
+    66                                  	;call printf
+    67                                  
+    68                                  	;end of program
+    69 00000018 B801000000              	mov eax,1
+    70 0000001D BB00000000              	mov ebx,0
+    71 00000022 CD80                    	int 80h
+    72                                  	;return 0
+    73                                  
+    74                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    75                                  
+    76                                  mult_mat:
+    77                                  	;multiplies matrices
+    78                                  	;a[],b[],n
+    79                                  
+    80 00000024 8B4C240C                	mov ecx,[esp+12]
+    81 00000028 81E901000000            	sub ecx,1
+    82                                  	
+    83 0000002E BA00000000              	mov edx,0
+    84                                  
+    85                                  L1_main:
+    86 00000033 8B44240C                	mov eax,[esp+12]
+    87 00000037 50                      	push eax
+    88                                  
+    89 00000038 8B442408                	mov eax,[esp+8]
+    90 0000003C 89CB                    	mov ebx,ecx
+    91 0000003E 69DB04000000            	imul ebx,4
+    92 00000044 01D8                    	add eax,ebx
+    93 00000046 50                      	push eax
+    94                                  
+    95 00000047 8B442404                	mov eax,[esp+4]
+    96 0000004B 8B5C240C                	mov ebx,[esp+12]
+    97 0000004F 0FAFD9                  	imul ebx,ecx
+    98 00000052 69DB04000000            	imul ebx,4
+    99 00000058 01D8                    	add eax,ebx
+   100 0000005A 50                      	push eax
+   101                                  
+   102 0000005B E8CC000000              	call mult_row
+   103                                  
+   104 00000060 01C2                    	add edx,eax
+   105 00000062 81E901000000            	sub ecx,1
+   106 00000068 81F900000000            	cmp ecx,0
+   107 0000006E 7DC3                    	jge L1_main
+   108                                  
+   109                                  L2_main:
+   110 00000070 89D0                    	mov eax,edx
+   111 00000072 50                      	push eax
+   112 00000073 C3                      	ret;
+   113                                  	;end of matmul
+   114                                  
+   115                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   116                                  
+   117                                  mult_mat_2d:
+   118                                  	
+   119                                  	;args a[],b[],n,C[] -- the sol
+   120 00000074 8B44240C                	mov eax,[esp+12]
+   121 00000078 2D01000000              	sub eax,1
+   122                                  
+   123 0000007D A3[51000000]            	mov dword [loop_i],eax
+   124 00000082 A3[55000000]            	mov dword [loop_j],eax
+   125                                  	;done with setting loop variables
+   126                                  	;push and pop eax for counter ops
+   127                                  
+   128                                  out_1:
+   129                                  
+   130                                  	;outer loop
+   131                                  out_2:
+   132                                  
+   133                                  	;inner loop
+   134                                  
+   135 00000087 8B54240C                	mov edx,[esp+12]
+   136 0000008B 52                      	push edx
+   137                                  
+   138 0000008C A1[55000000]            	mov eax,[loop_j]
+   139 00000091 69C004000000            	imul eax,4
+   140 00000097 0344240C                	add eax,[esp+8+4]
+   141 0000009B 50                      	push eax
+   142                                  
+   143 0000009C A1[51000000]            	mov eax,[loop_i]
+   144 000000A1 0FAFC2                  	imul eax,edx
+   145 000000A4 69C004000000            	imul eax,4
+   146 000000AA 0344240C                	add eax,[esp+4+8]
+   147 000000AE 50                      	push eax
+   148                                  
+   149 000000AF E878000000              	call mult_row
+   150                                  
+   151 000000B4 89C2                    	mov edx,eax
+   152                                  	
+   153 000000B6 58                      	pop eax
+   154 000000B7 58                      	pop eax
+   155 000000B8 58                      	pop eax
+   156                                  
+   157 000000B9 A1[51000000]            	mov eax,[loop_i]
+   158 000000BE 8B5C240C                    mov ebx,[esp+12]
+   159 000000C2 0FAFC3                  	imul eax,ebx
+   160 000000C5 8B1D[55000000]          	mov ebx,[loop_j]
+   161 000000CB 01D8                    	add eax,ebx
+   162 000000CD 69C004000000            	imul eax,4
+   163 000000D3 03442410                	add eax,[esp+16]
+   164 000000D7 8910                    	mov [eax],edx
+   165                                  	
+   166 000000D9 50                      	push eax
+   167 000000DA A1[55000000]            	mov eax,[loop_j]
+   168 000000DF 2D01000000              	sub eax,1
+   169 000000E4 A3[55000000]            	mov dword [loop_j],eax
+   170 000000E9 58                      	pop eax
+   171                                  
+   172 000000EA 50                      	push eax
+   173 000000EB A1[55000000]            	mov eax,[loop_j]
+   174 000000F0 3D00000000              	cmp eax,0
+   175 000000F5 58                      	pop eax
+   176                                  
+   177 000000F6 7D8F                    	jge out_2
+   178                                  
+   179                                  out_2_end:
+   180                                  
+   181                                  
+   182 000000F8 50                      	push eax
+   183 000000F9 8B44240C                	mov eax,[esp+12]
+   184 000000FD 2D01000000              	sub eax,1
+   185 00000102 A3[55000000]            	mov dword [loop_j],eax
+   186 00000107 58                      	pop eax
+   187                                  
+   188 00000108 50                      	push eax
+   189 00000109 A1[51000000]            	mov eax,[loop_i]
+   190 0000010E 2D01000000              	sub eax,1
+   191 00000113 A3[51000000]            	mov [loop_i],eax
+   192 00000118 58                      	pop eax
+   193                                  
+   194 00000119 50                      	push eax
+   195 0000011A A1[51000000]            	mov eax,[loop_i]
+   196 0000011F 3D00000000              	cmp eax,0
+   197 00000124 58                      	pop eax
+   198                                  
+   199 00000125 0F8D5CFFFFFF            	jge out_1
+   200                                  
+   201                                  out_1_end:
+   202                                  
+   203 0000012B C3                      	ret;
+   204                                  	;end of the procedure
+   205                                  
+   206                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   207                                  
+   208                                  mult_row:
+   209                                  	;multiplies a row
+   210                                  	;a[],b[],n
+   211                                  
+   212                                  	;mov eax,[esp+12]
+   213                                  	;push eax
+   214                                  	;push format
+   215                                  	;call printf
+   216                                  
+   217                                  
+   218                                  	;mov eax,[esp+12]
+   219                                  	;sub eax,1
+   220                                  	;imul eax,[esp+12]
+   221                                  	;imul eax,4
+   222                                  	;add [esp+8],eax
+   223                                  
+   224                                  	;mov eax,[esp+12]
+   225                                  	;sub eax,1
+   226                                  	;imul eax,4
+   227                                  	;add [esp+4],eax
+   228                                  
+   229                                  	;mov eax,[esp+12]
+   230                                  	;push eax
+   231                                  	;push format
+   232                                  	;call printf
+   233                                  
+   234 0000012C BB00000000              	mov ebx,0
+   235 00000131 8B4C240C                	mov ecx,[esp+12]
+   236 00000135 81E901000000            	sub ecx,1
+   237                                  L1:	
+   238 0000013B 89C8                    	mov eax,ecx
+   239 0000013D 0FAF44240C              	imul eax,[esp+12]
+   240 00000142 69C004000000            	imul eax,4
+   241 00000148 03442408                	add eax,[esp+8]
+   242 0000014C 8B10                    	mov edx,[eax]
+   243                                  
+   244 0000014E 8B442404                	mov eax,[esp+4]
+   245 00000152 51                      	push ecx
+   246 00000153 69C904000000            	imul ecx,4
+   247 00000159 01C8                    	add eax,ecx
+   248 0000015B 59                      	pop ecx
+   249                                  
+   250 0000015C 0FAF10                  	imul edx,[eax]
+   251 0000015F 01D3                    	add ebx,edx
+   252 00000161 81E901000000            	sub ecx,1
+   253                                  	
+   254 00000167 81F900000000            	cmp ecx,0
+   255 0000016D 7DCC                    	jge L1
+   256                                  
+   257                                  L2:
+   258 0000016F 89D8                    	mov eax,ebx
+   259                                  	;push eax
+   260 00000171 C3                      	ret
+   261                                  
+   262                                  	;end or row mult
+   263                                  
+   264                                  
