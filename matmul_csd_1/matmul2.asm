@@ -20,6 +20,10 @@ section .data
 	
 	aVec: dd 0
 	bVec: dd 0
+	
+	aOff: dd 0
+	bOff: dd 0
+	cOff: dd 0
 
 section .text:
 	global main
@@ -45,7 +49,12 @@ main:
 
 mult_mat_2d:
 	
-	;args a[],b[],n,C[] -- the sol
+	;args a[],b[],n,C[],ia,ja,ib,jb,Wid,ic,jc
+	;here  (ij) is the location of blocks A and B wrt to parent matrices
+	;Wid is the Width of parent matrix
+	;Work under assumption that it is a square
+	; A,B,C are the references of parent matrices only
+	
 	mov eax,[esp+12]
 	sub eax,1
 
@@ -53,7 +62,33 @@ mult_mat_2d:
 	mov dword [loop_j],eax
 	;done with setting loop variables
 	;push and pop eax for counter ops
-
+	
+	;find offset
+	
+	;;A's offset
+	mov edx,[esp+20]
+	sub edx,1
+	imul edx,[esp+36]
+	add edx,[esp+24]
+	imul eds,4
+	mov [aOff],edx
+	
+	;;B's offset
+	mov edx,[esp+28]
+	sub edx,1
+	imul edx,[esp+36]
+	add edx,[esp+32]
+	imul eds,4
+	mov [bOff],edx
+	
+	;;C's offset
+	mov edx,[esp+40]
+	sub edx,1
+	imul edx,[esp+36]
+	add edx,[esp+44]
+	imul eds,4
+	mov [cOff],edx
+	
 out_1:
 
 	;outer loop
@@ -61,25 +96,30 @@ out_2:
 
 	;inner loop
 
+	;current B off
 	mov eax,[loop_j]
 	imul eax,4
 	add eax,[esp+8]
+	add eax,[bOff]
 	mov dword [bVec],eax
 
+	;current A off
 	mov eax,[loop_i]
-	imul eax,[esp+12]
+	imul eax,[esp+36]
 	imul eax,4
 	add eax,[esp+4]
+	add eax,[aOff]
 	mov dword [aVec],eax
 	
-	;;;row ops here...
+	;;;row multiplication ops here...
 	
 	mov ebx,0
 	mov ecx,[esp+12]
 	sub ecx,1
+	
 out_3:	
 	mov eax,ecx
-	imul eax,[esp+12]
+	imul eax,[esp+36]
 	imul eax,4
 	add dword eax,[bVec]
 	mov edx,[eax]
@@ -103,11 +143,13 @@ out_3_exit:
 	
 	mov edx,ebx
 
+	;writing result of C
 	mov eax,[loop_i]
-	imul eax,[esp+12]
+	imul eax,[esp+36]
 	mov ebx,[loop_j]
 	add eax,ebx
 	imul eax,4
+	add eax,[cOff]
 	add eax,[esp+16]
 	mov [eax],edx
 	
@@ -146,6 +188,7 @@ add_mat_2d:
 	;here  (ij) is the location of blocks A and B wrt to parent matrices
 	;Wid is the Width of parent matrix
 	;Work under assumption that it is a square
+	; A,B,C are the references of parent matrices only
 
 	mov eax,[esp+12]
 	sub eax,1
