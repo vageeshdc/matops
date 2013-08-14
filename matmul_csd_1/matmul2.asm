@@ -4,7 +4,7 @@
 ;
 ;Info : a matrix multiplication implementation
 
-section .data
+SECTION .data
 	msg: db "sup there",16
 	len: equ $-msg
 
@@ -48,7 +48,7 @@ section .data
 
 	DD: dd 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
-section .text:
+SECTION .text
 	global main
 	extern printf
 
@@ -197,8 +197,10 @@ mult_block_2d:
 	mov [Bval],eax
 
 	mov eax,[Nval]
-	mov ebx,[Bval]
-	div ebx
+	mov ecx,[Bval]
+	mov edx,0
+	;donr specifically
+	div ecx
 
 	cmp edx,0
 	jne exit_error_noerror
