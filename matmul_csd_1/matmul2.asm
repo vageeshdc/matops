@@ -57,7 +57,7 @@ main:
 	;getting initial time
 	xor eax,eax
 	
-	;cpuid
+	cpuid
 	rdtsc
 
 	mov [CHval],edx
@@ -93,7 +93,8 @@ print_timer:
 	;;getting later time
 
 	xor eax,eax
-	;cpuid
+	
+	cpuid
 	rdtsc
 
 	sub eax,[CLval]
