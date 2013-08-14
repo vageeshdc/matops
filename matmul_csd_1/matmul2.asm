@@ -15,6 +15,10 @@ section .data
 
 	format: db " | %d ",0
 	format2: db " | ",10,0
+	format3: db " time taken %lld cycles .. ",10,0
+
+	CHval: dd 0
+	CLval: dd 0
 
 	loop_i: dd 0
 	loop_j: dd 0
@@ -49,7 +53,16 @@ section .text:
 	extern printf
 
 main:
+
+	;getting initial time
+	xor eax,eax
 	
+	;cpuid
+	rdtsc
+
+	mov [CHval],edx
+	mov [CLval],eax
+
 	;b
 	mov eax,2
     push eax
@@ -74,8 +87,22 @@ main:
 	mov eax,AA
 	push eax
 
-	;call add_mat_2d
 	call mult_block_2d
+
+print_timer:
+	;;getting later time
+
+	xor eax,eax
+	;cpuid
+	rdtsc
+
+	sub eax,[CLval]
+	sub edx,[CHval]
+
+	push eax
+	push edx
+	push format3
+	call printf
 
 	;; print the matrix C
 
