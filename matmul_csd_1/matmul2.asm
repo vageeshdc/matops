@@ -13,8 +13,9 @@ section .data
 	arr2: dd 1,2,3,4
 	arr3: dd 0,0,0,0
 
-	format: db "yo %d num",10,0
-	
+	format: db " | %d ",0
+	format2: db " | ",10,0
+
 	loop_i: dd 0
 	loop_j: dd 0
 	
@@ -75,6 +76,65 @@ main:
 
 	;call add_mat_2d
 	call mult_block_2d
+
+	;; print the matrix C
+
+	mov eax,4
+	mov [lop_i],eax
+
+	mov ebx,0
+	mov [loop_i],ebx
+	mov [loop_j],ebx
+
+pl1:
+
+pl2:
+
+	;; print to screen
+
+	mov ecx,[loop_i]
+	imul ecx,[lop_i]
+	add ecx,[loop_j]
+	imul ecx,4
+	add ecx,CC
+	
+	mov eax,[ecx]
+	push eax
+	push format
+	call printf
+
+	;;end of print
+
+	;update
+	
+	mov ebx,[loop_j]
+	add ebx,1
+	mov [loop_j],ebx
+
+	cmp ebx,[lop_i]
+	jl pl2
+
+pl2_out:
+
+	;new line print
+
+	push format2
+	call printf
+	;;
+
+	mov ebx,0
+	mov [loop_j],ebx
+
+	mov ebx,[loop_i]
+	add ebx,1
+	mov [loop_i],ebx
+
+	cmp ebx,[lop_i]
+	jl pl1
+
+pl1_out:
+
+	;; end of print bye
 
 	mov eax,1
 	mov ebx,0
