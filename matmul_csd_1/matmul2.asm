@@ -25,25 +25,292 @@ section .data
 	bOff: dd 0
 	cOff: dd 0
 
+	lop_i: dd 0
+	lop_j: dd 0
+	lop_k: dd 0
+	
+	Av: dd 0
+	Bv: dd 0
+	Cv: dd 0
+	Dv: dd 0
+	Nval: dd 0
+	Bval: dd 0
+
+	AA: dd 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+	BB: dd 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+
+	CC: dd 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+
+	DD: dd 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+
 section .text:
 	global main
 	extern printf
 
 main:
+	
+	;b
+	mov eax,2
     push eax
 
-	mov eax,2
-	push eax
-	mov eax,arr2
-
-	push eax
+	;N
+	mov eax,4
 	push eax
 
-	call add_mat_2d
+	;D
+	mov eax,DD
+	push eax
+
+	;C
+	mov eax,CC
+	push eax
+
+	;B
+	mov eax,BB
+	push eax
+
+	;A
+	mov eax,AA
+	push eax
+
+	;call add_mat_2d
+	call mult_block_2d
 
 	mov eax,1
 	mov ebx,0
 	int 80h
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+mult_block_2d:
+
+	;the params are A[],B[],C[],D[],N,b
+	; A,B are the ip C is the OP
+	; D is the dummy 
+	; N is the dimension
+	; b is the block parameter
+
+	mov eax,[esp+4]
+	mov [Av],eax
+
+	mov eax,[esp+8]
+	mov [Bv],eax
+
+	mov eax,[esp+12]
+	mov [Cv],eax
+
+	mov eax,[esp+16]
+	mov [Dv],eax
+
+	mov eax,[esp+20]
+	mov [Nval],eax
+
+	mov eax,[esp+24]
+	mov [Bval],eax
+
+	mov eax,[Nval]
+	mov ebx,[Bval]
+	div ebx
+
+	cmp edx,0
+	jne exit_error_noerror
+
+	;use lop_i,lop_j,lop_k
+	;ind ia ja ib jb ic jc id jd
+	
+	mov eax,0
+	mov [lop_i],eax
+	mov [lop_j],eax
+
+
+l1:
+	
+l2:
+	mov eax,0
+	mov [lop_k],eax
+	
+l3:
+	
+	;;mult here
+	
+	;jc
+	mov eax,[lop_k]
+	push eax
+
+	;ic
+	mov eax,0
+	push eax
+
+	;Wid
+	mov eax,[Nval]
+	push eax
+
+	;jb
+	mov eax,[lop_j]
+	push eax
+
+	;ib
+	mov eax,[lop_k]
+	push eax
+
+	;ja
+	mov eax,[lop_k]
+	push eax
+
+	;ia
+	mov eax,[lop_i]
+	push eax
+
+	;C
+	mov eax,[Dv]
+	push eax
+
+	;n
+	mov eax,[Bval]
+	push eax
+
+	;b
+	mov eax,[Bv]
+	push eax
+
+	;a
+	mov eax,[Av]
+	push eax
+
+	;; call the function
+	call mult_mat_2d
+
+	;; mult ends
+
+	pop eax
+	pop eax	
+	pop eax
+	pop eax	
+	pop eax	
+	pop eax	
+	pop eax	
+	pop eax	
+	pop eax	
+	pop eax	
+	pop eax	
+	
+	;loop management
+	mov eax,[lop_k]
+	add eax,[Bval]
+	mov [lop_k],eax
+
+	cmp eax,[Nval]
+	jl l3
+
+l3_out:
+
+	;; add ops here
+	
+	mov eax,0
+	mov [lop_k],eax
+
+l4:
+
+	;; push ops
+
+	;jc
+	mov eax,[lop_j]
+	push eax
+
+	;ic
+	mov eax,[lop_i]
+	push eax
+
+	;Wid
+	mov eax,[Nval]
+	push eax
+
+	;jb
+	mov eax,[lop_j]
+	push eax
+
+	;ib
+	mov eax,[lop_i]
+	push eax
+
+	;ja
+	mov eax,[lop_k]
+	push eax
+
+	;ia
+	mov eax,0
+	push eax
+
+	;C
+	mov eax,[Cv]
+	push eax
+
+	;n
+	mov eax,[Bval]
+	push eax
+
+	;b
+	mov eax,[Cv]
+	push eax
+
+	;a
+	mov eax,[Dv]
+	push eax
+
+	;; call
+	call add_mat_2d
+
+	;;end of pushops
+	
+	pop eax
+	pop eax	
+	pop eax
+	pop eax	
+	pop eax	
+	pop eax	
+	pop eax	
+	pop eax	
+	pop eax	
+	pop eax	
+	pop eax	
+
+	mov eax,[lop_k]
+	add eax,[Bval]
+	mov [lop_k],eax
+
+	cmp eax,[Nval]
+	jl l4
+
+l4_out:
+
+	;; end of add ops
+
+
+
+	mov eax,[lop_j]
+	add eax,[Bval]
+	mov [lop_j],eax
+
+	cmp eax,[Nval]
+	jl l2
+
+l2_out:
+	
+	mov eax,0
+	mov [lop_j],eax
+
+	mov eax,[lop_i]
+	add eax,[Bval]
+	mov [lop_i],eax
+
+	cmp eax,[Nval]
+	jl l1
+
+l1_out:
+	
+
+exit_error_noerror:
+	ret;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -70,7 +337,7 @@ mult_mat_2d:
 	sub edx,1
 	imul edx,[esp+36]
 	add edx,[esp+24]
-	imul eds,4
+	imul edx,4
 	mov [aOff],edx
 	
 	;;B's offset
@@ -78,7 +345,7 @@ mult_mat_2d:
 	sub edx,1
 	imul edx,[esp+36]
 	add edx,[esp+32]
-	imul eds,4
+	imul edx,4
 	mov [bOff],edx
 	
 	;;C's offset
@@ -86,7 +353,7 @@ mult_mat_2d:
 	sub edx,1
 	imul edx,[esp+36]
 	add edx,[esp+44]
-	imul eds,4
+	imul edx,4
 	mov [cOff],edx
 	
 out_1:
@@ -209,7 +476,7 @@ out_2a:
 	sub edx,1
 	imul edx,[esp+36]
 	add edx,[esp+24]
-	imul eds,4
+	imul edx,4
 	mov [aOff],edx
 	
 	;;B's offset
@@ -217,7 +484,7 @@ out_2a:
 	sub edx,1
 	imul edx,[esp+36]
 	add edx,[esp+32]
-	imul eds,4
+	imul edx,4
 	mov [bOff],edx
 	
 	;;C's offset
@@ -225,7 +492,7 @@ out_2a:
 	sub edx,1
 	imul edx,[esp+36]
 	add edx,[esp+44]
-	imul eds,4
+	imul edx,4
 	mov [cOff],edx
 	
 	;common offset
@@ -249,7 +516,7 @@ out_2a:
 	;store to C[]
 	mov ecx,[esp+16]
 	add ecx,ebx
-	add ecx.[cOff]
+	add ecx,[cOff]
 	mov [ecx],eax
 
 	;;end of addition
