@@ -71,6 +71,20 @@ main:
 	mov [CHval],edx
 	mov [CLval],eax
 
+	;transporse
+	mov eax,4
+	push eax
+	mov eax,AA
+	push eax
+	call trans_mat_2d
+
+	mov eax,4
+	push eax
+	mov eax,BB
+	push eax
+	call trans_mat_2d
+	;end of transpose
+
 	;b
 	mov eax,2
     push eax
@@ -80,22 +94,30 @@ main:
 	push eax
 
 	;D
-	mov eax,arr3
+	mov eax,DD
 	push eax
 
 	;C
-	mov eax,arr4
+	mov eax,CC
 	push eax
 
 	;B
-	mov eax,arr2
+	mov eax,AA
 	push eax
 
 	;A
-	mov eax,arr2
+	mov eax,BB
 	push eax
 
 	call mult_block_2d
+
+	;transporse
+	mov eax,4
+	push eax
+	mov eax,CC
+	push eax
+	call trans_mat_2d
+
 
 print_timer:
 	;;getting later time
@@ -115,7 +137,7 @@ print_timer:
 
 	;; print the matrix C
 
-	mov eax,2
+	mov eax,4
 	mov [lop_i],eax
 
 	mov ebx,0
@@ -649,10 +671,9 @@ out_1a_end:
 trans_mat_2d:
 	;args - A[],N
 	
-	mov eax,[esp+8]
-
-	mov dword [loop_i],0
-	mov dword [loop_j],0
+	mov eax,0
+	mov [loop_i],eax
+	mov [loop_j],eax
 
 tl_1:
 
@@ -689,8 +710,9 @@ tl_2:
 	jle tl_2
 
 tl2_out:
-
-	mov dword [loop_j],0
+	
+	mov eax,0
+	mov [loop_j],eax
 
 	mov eax,[loop_i]
 	add eax,1

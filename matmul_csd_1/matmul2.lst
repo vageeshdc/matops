@@ -124,640 +124,659 @@
    124 00000006 8915[8F000000]          	mov [CHval],edx
    125 0000000C A3[93000000]            	mov [CLval],eax
    126                                  
-   127                                  	;b
-   128 00000011 B802000000              	mov eax,2
-   129 00000016 50                          push eax
-   130                                  
-   131                                  	;N
-   132 00000017 B804000000              	mov eax,4
-   133 0000001C 50                      	push eax
-   134                                  
-   135                                  	;D
-   136 0000001D B8[36000000]            	mov eax,arr3
-   137 00000022 50                      	push eax
-   138                                  
-   139                                  	;C
-   140 00000023 B8[46000000]            	mov eax,arr4
-   141 00000028 50                      	push eax
-   142                                  
-   143                                  	;B
-   144 00000029 B8[26000000]            	mov eax,arr2
-   145 0000002E 50                      	push eax
-   146                                  
-   147                                  	;A
-   148 0000002F B8[26000000]            	mov eax,arr2
-   149 00000034 50                      	push eax
-   150                                  
-   151 00000035 E8B1000000              	call mult_block_2d
+   127                                  	;transporse
+   128 00000011 B804000000              	mov eax,4
+   129 00000016 50                      	push eax
+   130 00000017 B8[E3000000]            	mov eax,AA
+   131 0000001C 50                      	push eax
+   132 0000001D E87C040000              	call trans_mat_2d
+   133                                  
+   134 00000022 B804000000              	mov eax,4
+   135 00000027 50                      	push eax
+   136 00000028 B8[23010000]            	mov eax,BB
+   137 0000002D 50                      	push eax
+   138 0000002E E86B040000              	call trans_mat_2d
+   139                                  	;end of transpose
+   140                                  
+   141                                  	;b
+   142 00000033 B802000000              	mov eax,2
+   143 00000038 50                          push eax
+   144                                  
+   145                                  	;N
+   146 00000039 B804000000              	mov eax,4
+   147 0000003E 50                      	push eax
+   148                                  
+   149                                  	;D
+   150 0000003F B8[23020000]            	mov eax,DD
+   151 00000044 50                      	push eax
    152                                  
-   153                                  print_timer:
-   154                                  	;;getting later time
-   155                                  
-   156 0000003A 31C0                    	xor eax,eax
-   157                                  	
-   158 0000003C 0FA2                    	cpuid
-   159 0000003E 0F31                    	rdtsc
+   153                                  	;C
+   154 00000045 B8[E3010000]            	mov eax,CC
+   155 0000004A 50                      	push eax
+   156                                  
+   157                                  	;B
+   158 0000004B B8[E3000000]            	mov eax,AA
+   159 00000050 50                      	push eax
    160                                  
-   161 00000040 2B05[93000000]          	sub eax,[CLval]
-   162 00000046 2B15[8F000000]          	sub edx,[CHval]
-   163                                  
-   164 0000004C 50                      	push eax
-   165 0000004D 52                      	push edx
-   166 0000004E 68[72000000]            	push format3
-   167 00000053 E8(00000000)            	call printf
-   168                                  
-   169                                  	;; print the matrix C
-   170                                  
-   171 00000058 B802000000              	mov eax,2
-   172 0000005D A3[BF000000]            	mov [lop_i],eax
+   161                                  	;A
+   162 00000051 B8[23010000]            	mov eax,BB
+   163 00000056 50                      	push eax
+   164                                  
+   165 00000057 E8C2000000              	call mult_block_2d
+   166                                  
+   167                                  	;transporse
+   168 0000005C B804000000              	mov eax,4
+   169 00000061 50                      	push eax
+   170 00000062 B8[E3010000]            	mov eax,CC
+   171 00000067 50                      	push eax
+   172 00000068 E831040000              	call trans_mat_2d
    173                                  
-   174 00000062 BB00000000              	mov ebx,0
-   175 00000067 891D[97000000]          	mov [loop_i],ebx
-   176 0000006D 891D[9B000000]          	mov [loop_j],ebx
+   174                                  
+   175                                  print_timer:
+   176                                  	;;getting later time
    177                                  
-   178                                  pl1:
-   179                                  
-   180                                  pl2:
-   181                                  
-   182                                  	;; print to screen
-   183                                  
-   184 00000073 8B0D[97000000]          	mov ecx,[loop_i]
-   185 00000079 0FAF0D[BF000000]        	imul ecx,[lop_i]
-   186 00000080 030D[9B000000]          	add ecx,[loop_j]
-   187 00000086 6BC904                  	imul ecx,4
-   188 00000089 81C1[46000000]          	add ecx,arr4
-   189                                  	
-   190 0000008F 8B01                    	mov eax,[ecx]
-   191 00000091 50                      	push eax
-   192 00000092 68[66000000]            	push format
-   193 00000097 E8(00000000)            	call printf
-   194                                  
-   195                                  	;;end of print
-   196                                  
-   197                                  	;update
-   198                                  	
-   199 0000009C 8B1D[9B000000]          	mov ebx,[loop_j]
-   200 000000A2 83C301                  	add ebx,1
-   201 000000A5 891D[9B000000]          	mov [loop_j],ebx
-   202                                  
-   203 000000AB 3B1D[BF000000]          	cmp ebx,[lop_i]
-   204 000000B1 7CC0                    	jl pl2
+   178 0000006D 31C0                    	xor eax,eax
+   179                                  	
+   180 0000006F 0FA2                    	cpuid
+   181 00000071 0F31                    	rdtsc
+   182                                  
+   183 00000073 2B05[93000000]          	sub eax,[CLval]
+   184 00000079 2B15[8F000000]          	sub edx,[CHval]
+   185                                  
+   186 0000007F 50                      	push eax
+   187 00000080 52                      	push edx
+   188 00000081 68[72000000]            	push format3
+   189 00000086 E8(00000000)            	call printf
+   190                                  
+   191                                  	;; print the matrix C
+   192                                  
+   193 0000008B B804000000              	mov eax,4
+   194 00000090 A3[BF000000]            	mov [lop_i],eax
+   195                                  
+   196 00000095 BB00000000              	mov ebx,0
+   197 0000009A 891D[97000000]          	mov [loop_i],ebx
+   198 000000A0 891D[9B000000]          	mov [loop_j],ebx
+   199                                  
+   200                                  pl1:
+   201                                  
+   202                                  pl2:
+   203                                  
+   204                                  	;; print to screen
    205                                  
-   206                                  pl2_out:
-   207                                  
-   208                                  	;new line print
-   209                                  
-   210 000000B3 68[6D000000]            	push format2
-   211 000000B8 E8(00000000)            	call printf
-   212                                  	;;
-   213                                  
-   214 000000BD BB00000000              	mov ebx,0
-   215 000000C2 891D[9B000000]          	mov [loop_j],ebx
+   206 000000A6 8B0D[97000000]          	mov ecx,[loop_i]
+   207 000000AC 0FAF0D[BF000000]        	imul ecx,[lop_i]
+   208 000000B3 030D[9B000000]          	add ecx,[loop_j]
+   209 000000B9 6BC904                  	imul ecx,4
+   210 000000BC 81C1[46000000]          	add ecx,arr4
+   211                                  	
+   212 000000C2 8B01                    	mov eax,[ecx]
+   213 000000C4 50                      	push eax
+   214 000000C5 68[66000000]            	push format
+   215 000000CA E8(00000000)            	call printf
    216                                  
-   217 000000C8 8B1D[97000000]          	mov ebx,[loop_i]
-   218 000000CE 83C301                  	add ebx,1
-   219 000000D1 891D[97000000]          	mov [loop_i],ebx
-   220                                  
-   221 000000D7 3B1D[BF000000]          	cmp ebx,[lop_i]
-   222 000000DD 7C94                    	jl pl1
-   223                                  
-   224                                  pl1_out:
-   225                                  
-   226                                  	;; end of print bye
+   217                                  	;;end of print
+   218                                  
+   219                                  	;update
+   220                                  	
+   221 000000CF 8B1D[9B000000]          	mov ebx,[loop_j]
+   222 000000D5 83C301                  	add ebx,1
+   223 000000D8 891D[9B000000]          	mov [loop_j],ebx
+   224                                  
+   225 000000DE 3B1D[BF000000]          	cmp ebx,[lop_i]
+   226 000000E4 7CC0                    	jl pl2
    227                                  
-   228 000000DF B801000000              	mov eax,1
-   229 000000E4 BB00000000              	mov ebx,0
-   230 000000E9 CD80                    	int 80h
+   228                                  pl2_out:
+   229                                  
+   230                                  	;new line print
    231                                  
-   232                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   233                                  
-   234                                  mult_block_2d:
+   232 000000E6 68[6D000000]            	push format2
+   233 000000EB E8(00000000)            	call printf
+   234                                  	;;
    235                                  
-   236                                  	;the params are A[],B[],C[],D[],N,b
-   237                                  	; A,B are the ip C is the OP
-   238                                  	; D is the dummy 
-   239                                  	; N is the dimension
-   240                                  	; b is the block parameter
-   241                                  
-   242 000000EB 8B442404                	mov eax,[esp+4]
-   243 000000EF A3[CB000000]            	mov [Av],eax
-   244                                  
-   245 000000F4 8B442408                	mov eax,[esp+8]
-   246 000000F8 A3[CF000000]            	mov [Bv],eax
+   236 000000F0 BB00000000              	mov ebx,0
+   237 000000F5 891D[9B000000]          	mov [loop_j],ebx
+   238                                  
+   239 000000FB 8B1D[97000000]          	mov ebx,[loop_i]
+   240 00000101 83C301                  	add ebx,1
+   241 00000104 891D[97000000]          	mov [loop_i],ebx
+   242                                  
+   243 0000010A 3B1D[BF000000]          	cmp ebx,[lop_i]
+   244 00000110 7C94                    	jl pl1
+   245                                  
+   246                                  pl1_out:
    247                                  
-   248 000000FD 8B44240C                	mov eax,[esp+12]
-   249 00000101 A3[D3000000]            	mov [Cv],eax
-   250                                  
-   251 00000106 8B442410                	mov eax,[esp+16]
-   252 0000010A A3[D7000000]            	mov [Dv],eax
+   248                                  	;; end of print bye
+   249                                  
+   250 00000112 B801000000              	mov eax,1
+   251 00000117 BB00000000              	mov ebx,0
+   252 0000011C CD80                    	int 80h
    253                                  
-   254 0000010F 8B442414                	mov eax,[esp+20]
-   255 00000113 A3[DB000000]            	mov [Nval],eax
-   256                                  
-   257 00000118 8B442418                	mov eax,[esp+24]
-   258 0000011C A3[DF000000]            	mov [Bval],eax
-   259                                  
-   260 00000121 A1[DB000000]            	mov eax,[Nval]
-   261 00000126 8B0D[DF000000]          	mov ecx,[Bval]
-   262 0000012C BA00000000              	mov edx,0
-   263                                  	;donr specifically
-   264 00000131 F7F1                    	div ecx
-   265                                  
-   266 00000133 83FA00                  	cmp edx,0
-   267 00000136 0F8539010000            	jne exit_error_noerror
-   268                                  
-   269                                  	;use lop_i,lop_j,lop_k
-   270                                  	;ind ia ja ib jb ic jc id jd
-   271                                  	
-   272 0000013C B800000000              	mov eax,0
-   273 00000141 A3[BF000000]            	mov [lop_i],eax
-   274 00000146 A3[C3000000]            	mov [lop_j],eax
+   254                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   255                                  
+   256                                  mult_block_2d:
+   257                                  
+   258                                  	;the params are A[],B[],C[],D[],N,b
+   259                                  	; A,B are the ip C is the OP
+   260                                  	; D is the dummy 
+   261                                  	; N is the dimension
+   262                                  	; b is the block parameter
+   263                                  
+   264 0000011E 8B442404                	mov eax,[esp+4]
+   265 00000122 A3[CB000000]            	mov [Av],eax
+   266                                  
+   267 00000127 8B442408                	mov eax,[esp+8]
+   268 0000012B A3[CF000000]            	mov [Bv],eax
+   269                                  
+   270 00000130 8B44240C                	mov eax,[esp+12]
+   271 00000134 A3[D3000000]            	mov [Cv],eax
+   272                                  
+   273 00000139 8B442410                	mov eax,[esp+16]
+   274 0000013D A3[D7000000]            	mov [Dv],eax
    275                                  
-   276                                  
-   277                                  l1:
-   278                                  	
-   279                                  l2:
-   280 0000014B B800000000              	mov eax,0
-   281 00000150 A3[C7000000]            	mov [lop_k],eax
-   282                                  	
-   283                                  l3:
-   284                                  	
-   285                                  	;;mult here
-   286                                  	
-   287                                  	;jc
-   288 00000155 A1[C7000000]            	mov eax,[lop_k]
-   289 0000015A 50                      	push eax
+   276 00000142 8B442414                	mov eax,[esp+20]
+   277 00000146 A3[DB000000]            	mov [Nval],eax
+   278                                  
+   279 0000014B 8B442418                	mov eax,[esp+24]
+   280 0000014F A3[DF000000]            	mov [Bval],eax
+   281                                  
+   282 00000154 A1[DB000000]            	mov eax,[Nval]
+   283 00000159 8B0D[DF000000]          	mov ecx,[Bval]
+   284 0000015F BA00000000              	mov edx,0
+   285                                  	;donr specifically
+   286 00000164 F7F1                    	div ecx
+   287                                  
+   288 00000166 83FA00                  	cmp edx,0
+   289 00000169 0F8539010000            	jne exit_error_noerror
    290                                  
-   291                                  	;ic
-   292 0000015B B800000000              	mov eax,0
-   293 00000160 50                      	push eax
-   294                                  
-   295                                  	;Wid
-   296 00000161 A1[DB000000]            	mov eax,[Nval]
-   297 00000166 50                      	push eax
+   291                                  	;use lop_i,lop_j,lop_k
+   292                                  	;ind ia ja ib jb ic jc id jd
+   293                                  	
+   294 0000016F B800000000              	mov eax,0
+   295 00000174 A3[BF000000]            	mov [lop_i],eax
+   296 00000179 A3[C3000000]            	mov [lop_j],eax
+   297                                  
    298                                  
-   299                                  	;jb
-   300 00000167 A1[C3000000]            	mov eax,[lop_j]
-   301 0000016C 50                      	push eax
-   302                                  
-   303                                  	;ib
-   304 0000016D A1[C7000000]            	mov eax,[lop_k]
-   305 00000172 50                      	push eax
-   306                                  
-   307                                  	;ja
-   308 00000173 A1[C7000000]            	mov eax,[lop_k]
-   309 00000178 50                      	push eax
-   310                                  
-   311                                  	;ia
-   312 00000179 A1[BF000000]            	mov eax,[lop_i]
-   313 0000017E 50                      	push eax
-   314                                  
-   315                                  	;C
-   316 0000017F A1[D7000000]            	mov eax,[Dv]
-   317 00000184 50                      	push eax
-   318                                  
-   319                                  	;n
-   320 00000185 A1[DF000000]            	mov eax,[Bval]
-   321 0000018A 50                      	push eax
-   322                                  
-   323                                  	;b
-   324 0000018B A1[CF000000]            	mov eax,[Bv]
-   325 00000190 50                      	push eax
-   326                                  
-   327                                  	;a
-   328 00000191 A1[CB000000]            	mov eax,[Av]
-   329 00000196 50                      	push eax
-   330                                  
-   331                                  	;; call the function
-   332 00000197 E8DA000000              	call mult_mat_2d
-   333                                  
-   334                                  	;; mult ends
-   335                                  
-   336 0000019C 58                      	pop eax
-   337 0000019D 58                      	pop eax	
-   338 0000019E 58                      	pop eax
-   339 0000019F 58                      	pop eax	
-   340 000001A0 58                      	pop eax	
-   341 000001A1 58                      	pop eax	
-   342 000001A2 58                      	pop eax	
-   343 000001A3 58                      	pop eax	
-   344 000001A4 58                      	pop eax	
-   345 000001A5 58                      	pop eax	
-   346 000001A6 58                      	pop eax	
-   347                                  	
-   348                                  	;loop management
-   349 000001A7 A1[C7000000]            	mov eax,[lop_k]
-   350 000001AC 0305[DF000000]          	add eax,[Bval]
-   351 000001B2 A3[C7000000]            	mov [lop_k],eax
+   299                                  l1:
+   300                                  	
+   301                                  l2:
+   302 0000017E B800000000              	mov eax,0
+   303 00000183 A3[C7000000]            	mov [lop_k],eax
+   304                                  	
+   305                                  l3:
+   306                                  	
+   307                                  	;;mult here
+   308                                  	
+   309                                  	;jc
+   310 00000188 A1[C7000000]            	mov eax,[lop_k]
+   311 0000018D 50                      	push eax
+   312                                  
+   313                                  	;ic
+   314 0000018E B800000000              	mov eax,0
+   315 00000193 50                      	push eax
+   316                                  
+   317                                  	;Wid
+   318 00000194 A1[DB000000]            	mov eax,[Nval]
+   319 00000199 50                      	push eax
+   320                                  
+   321                                  	;jb
+   322 0000019A A1[C3000000]            	mov eax,[lop_j]
+   323 0000019F 50                      	push eax
+   324                                  
+   325                                  	;ib
+   326 000001A0 A1[C7000000]            	mov eax,[lop_k]
+   327 000001A5 50                      	push eax
+   328                                  
+   329                                  	;ja
+   330 000001A6 A1[C7000000]            	mov eax,[lop_k]
+   331 000001AB 50                      	push eax
+   332                                  
+   333                                  	;ia
+   334 000001AC A1[BF000000]            	mov eax,[lop_i]
+   335 000001B1 50                      	push eax
+   336                                  
+   337                                  	;C
+   338 000001B2 A1[D7000000]            	mov eax,[Dv]
+   339 000001B7 50                      	push eax
+   340                                  
+   341                                  	;n
+   342 000001B8 A1[DF000000]            	mov eax,[Bval]
+   343 000001BD 50                      	push eax
+   344                                  
+   345                                  	;b
+   346 000001BE A1[CF000000]            	mov eax,[Bv]
+   347 000001C3 50                      	push eax
+   348                                  
+   349                                  	;a
+   350 000001C4 A1[CB000000]            	mov eax,[Av]
+   351 000001C9 50                      	push eax
    352                                  
-   353 000001B7 3B05[DB000000]          	cmp eax,[Nval]
-   354 000001BD 7C96                    	jl l3
+   353                                  	;; call the function
+   354 000001CA E8DA000000              	call mult_mat_2d
    355                                  
-   356                                  l3_out:
+   356                                  	;; mult ends
    357                                  
-   358                                  	;; add ops here
-   359                                  	
-   360 000001BF B800000000              	mov eax,0
-   361 000001C4 A3[C7000000]            	mov [lop_k],eax
-   362                                  
-   363                                  l4:
-   364                                  
-   365                                  	;; push ops
-   366                                  
-   367                                  	;jc
-   368 000001C9 A1[C3000000]            	mov eax,[lop_j]
-   369 000001CE 50                      	push eax
-   370                                  
-   371                                  	;ic
-   372 000001CF A1[BF000000]            	mov eax,[lop_i]
-   373 000001D4 50                      	push eax
+   358 000001CF 58                      	pop eax
+   359 000001D0 58                      	pop eax	
+   360 000001D1 58                      	pop eax
+   361 000001D2 58                      	pop eax	
+   362 000001D3 58                      	pop eax	
+   363 000001D4 58                      	pop eax	
+   364 000001D5 58                      	pop eax	
+   365 000001D6 58                      	pop eax	
+   366 000001D7 58                      	pop eax	
+   367 000001D8 58                      	pop eax	
+   368 000001D9 58                      	pop eax	
+   369                                  	
+   370                                  	;loop management
+   371 000001DA A1[C7000000]            	mov eax,[lop_k]
+   372 000001DF 0305[DF000000]          	add eax,[Bval]
+   373 000001E5 A3[C7000000]            	mov [lop_k],eax
    374                                  
-   375                                  	;Wid
-   376 000001D5 A1[DB000000]            	mov eax,[Nval]
-   377 000001DA 50                      	push eax
-   378                                  
-   379                                  	;jb
-   380 000001DB A1[C3000000]            	mov eax,[lop_j]
-   381 000001E0 50                      	push eax
-   382                                  
-   383                                  	;ib
-   384 000001E1 A1[BF000000]            	mov eax,[lop_i]
-   385 000001E6 50                      	push eax
+   375 000001EA 3B05[DB000000]          	cmp eax,[Nval]
+   376 000001F0 7C96                    	jl l3
+   377                                  
+   378                                  l3_out:
+   379                                  
+   380                                  	;; add ops here
+   381                                  	
+   382 000001F2 B800000000              	mov eax,0
+   383 000001F7 A3[C7000000]            	mov [lop_k],eax
+   384                                  
+   385                                  l4:
    386                                  
-   387                                  	;ja
-   388 000001E7 A1[C7000000]            	mov eax,[lop_k]
-   389 000001EC 50                      	push eax
-   390                                  
-   391                                  	;ia
-   392 000001ED B800000000              	mov eax,0
-   393 000001F2 50                      	push eax
-   394                                  
-   395                                  	;C
-   396 000001F3 A1[D3000000]            	mov eax,[Cv]
-   397 000001F8 50                      	push eax
-   398                                  
-   399                                  	;n
-   400 000001F9 A1[DF000000]            	mov eax,[Bval]
-   401 000001FE 50                      	push eax
-   402                                  
-   403                                  	;b
-   404 000001FF A1[D3000000]            	mov eax,[Cv]
-   405 00000204 50                      	push eax
-   406                                  
-   407                                  	;a
-   408 00000205 A1[D7000000]            	mov eax,[Dv]
-   409 0000020A 50                      	push eax
-   410                                  
-   411                                  	;; call
-   412 0000020B E888010000              	call add_mat_2d
-   413                                  
-   414                                  	;;end of pushops
-   415                                  	
-   416 00000210 58                      	pop eax
-   417 00000211 58                      	pop eax	
-   418 00000212 58                      	pop eax
-   419 00000213 58                      	pop eax	
-   420 00000214 58                      	pop eax	
-   421 00000215 58                      	pop eax	
-   422 00000216 58                      	pop eax	
-   423 00000217 58                      	pop eax	
-   424 00000218 58                      	pop eax	
-   425 00000219 58                      	pop eax	
-   426 0000021A 58                      	pop eax	
-   427                                  
-   428 0000021B A1[C7000000]            	mov eax,[lop_k]
-   429 00000220 0305[DF000000]          	add eax,[Bval]
-   430 00000226 A3[C7000000]            	mov [lop_k],eax
-   431                                  
-   432 0000022B 3B05[DB000000]          	cmp eax,[Nval]
-   433 00000231 7C96                    	jl l4
-   434                                  
-   435                                  l4_out:
-   436                                  
-   437                                  	;; end of add ops
-   438                                  
-   439                                  
-   440                                  
-   441 00000233 A1[C3000000]            	mov eax,[lop_j]
-   442 00000238 0305[DF000000]          	add eax,[Bval]
-   443 0000023E A3[C3000000]            	mov [lop_j],eax
-   444                                  
-   445 00000243 3B05[DB000000]          	cmp eax,[Nval]
-   446 00000249 0F8CFCFEFFFF            	jl l2
-   447                                  
-   448                                  l2_out:
-   449                                  	
-   450 0000024F B800000000              	mov eax,0
-   451 00000254 A3[C3000000]            	mov [lop_j],eax
-   452                                  
-   453 00000259 A1[BF000000]            	mov eax,[lop_i]
-   454 0000025E 0305[DF000000]          	add eax,[Bval]
-   455 00000264 A3[BF000000]            	mov [lop_i],eax
+   387                                  	;; push ops
+   388                                  
+   389                                  	;jc
+   390 000001FC A1[C3000000]            	mov eax,[lop_j]
+   391 00000201 50                      	push eax
+   392                                  
+   393                                  	;ic
+   394 00000202 A1[BF000000]            	mov eax,[lop_i]
+   395 00000207 50                      	push eax
+   396                                  
+   397                                  	;Wid
+   398 00000208 A1[DB000000]            	mov eax,[Nval]
+   399 0000020D 50                      	push eax
+   400                                  
+   401                                  	;jb
+   402 0000020E A1[C3000000]            	mov eax,[lop_j]
+   403 00000213 50                      	push eax
+   404                                  
+   405                                  	;ib
+   406 00000214 A1[BF000000]            	mov eax,[lop_i]
+   407 00000219 50                      	push eax
+   408                                  
+   409                                  	;ja
+   410 0000021A A1[C7000000]            	mov eax,[lop_k]
+   411 0000021F 50                      	push eax
+   412                                  
+   413                                  	;ia
+   414 00000220 B800000000              	mov eax,0
+   415 00000225 50                      	push eax
+   416                                  
+   417                                  	;C
+   418 00000226 A1[D3000000]            	mov eax,[Cv]
+   419 0000022B 50                      	push eax
+   420                                  
+   421                                  	;n
+   422 0000022C A1[DF000000]            	mov eax,[Bval]
+   423 00000231 50                      	push eax
+   424                                  
+   425                                  	;b
+   426 00000232 A1[D3000000]            	mov eax,[Cv]
+   427 00000237 50                      	push eax
+   428                                  
+   429                                  	;a
+   430 00000238 A1[D7000000]            	mov eax,[Dv]
+   431 0000023D 50                      	push eax
+   432                                  
+   433                                  	;; call
+   434 0000023E E888010000              	call add_mat_2d
+   435                                  
+   436                                  	;;end of pushops
+   437                                  	
+   438 00000243 58                      	pop eax
+   439 00000244 58                      	pop eax	
+   440 00000245 58                      	pop eax
+   441 00000246 58                      	pop eax	
+   442 00000247 58                      	pop eax	
+   443 00000248 58                      	pop eax	
+   444 00000249 58                      	pop eax	
+   445 0000024A 58                      	pop eax	
+   446 0000024B 58                      	pop eax	
+   447 0000024C 58                      	pop eax	
+   448 0000024D 58                      	pop eax	
+   449                                  
+   450 0000024E A1[C7000000]            	mov eax,[lop_k]
+   451 00000253 0305[DF000000]          	add eax,[Bval]
+   452 00000259 A3[C7000000]            	mov [lop_k],eax
+   453                                  
+   454 0000025E 3B05[DB000000]          	cmp eax,[Nval]
+   455 00000264 7C96                    	jl l4
    456                                  
-   457 00000269 3B05[DB000000]          	cmp eax,[Nval]
-   458 0000026F 0F8CD6FEFFFF            	jl l1
-   459                                  
-   460                                  l1_out:
-   461                                  	
+   457                                  l4_out:
+   458                                  
+   459                                  	;; end of add ops
+   460                                  
+   461                                  
    462                                  
-   463                                  exit_error_noerror:
-   464 00000275 C3                      	ret;;
-   465                                  
-   466                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   467                                  
-   468                                  mult_mat_2d:
-   469                                  	
-   470                                  	;args a[],b[],n,C[],ia,ja,ib,jb,Wid,ic,jc
-   471                                  	;here  (ij) is the location of blocks A and B wrt to parent matrices
-   472                                  	;Wid is the Width of parent matrix
-   473                                  	;Work under assumption that it is a square
-   474                                  	; A,B,C are the references of parent matrices only
-   475                                  	
-   476 00000276 8B44240C                	mov eax,[esp+12]
-   477 0000027A 83E801                  	sub eax,1
+   463 00000266 A1[C3000000]            	mov eax,[lop_j]
+   464 0000026B 0305[DF000000]          	add eax,[Bval]
+   465 00000271 A3[C3000000]            	mov [lop_j],eax
+   466                                  
+   467 00000276 3B05[DB000000]          	cmp eax,[Nval]
+   468 0000027C 0F8CFCFEFFFF            	jl l2
+   469                                  
+   470                                  l2_out:
+   471                                  	
+   472 00000282 B800000000              	mov eax,0
+   473 00000287 A3[C3000000]            	mov [lop_j],eax
+   474                                  
+   475 0000028C A1[BF000000]            	mov eax,[lop_i]
+   476 00000291 0305[DF000000]          	add eax,[Bval]
+   477 00000297 A3[BF000000]            	mov [lop_i],eax
    478                                  
-   479 0000027D A3[97000000]            	mov dword [loop_i],eax
-   480 00000282 A3[9B000000]            	mov dword [loop_j],eax
-   481                                  	;done with setting loop variables
-   482                                  	;push and pop eax for counter ops
+   479 0000029C 3B05[DB000000]          	cmp eax,[Nval]
+   480 000002A2 0F8CD6FEFFFF            	jl l1
+   481                                  
+   482                                  l1_out:
    483                                  	
-   484                                  	;find offset
-   485                                  	
-   486                                  	;;A's offset
-   487 00000287 8B542414                	mov edx,[esp+20]
-   488 0000028B 83EA01                  	sub edx,1
-   489 0000028E 0FAF542424              	imul edx,[esp+36]
-   490 00000293 03542418                	add edx,[esp+24]
-   491 00000297 6BD204                  	imul edx,4
-   492 0000029A 8915[A7000000]          	mov [aOff],edx
-   493                                  	
-   494                                  	;;B's offset
-   495 000002A0 8B54241C                	mov edx,[esp+28]
-   496 000002A4 83EA01                  	sub edx,1
-   497 000002A7 0FAF542424              	imul edx,[esp+36]
-   498 000002AC 03542420                	add edx,[esp+32]
-   499 000002B0 6BD204                  	imul edx,4
-   500 000002B3 8915[AB000000]          	mov [bOff],edx
-   501                                  	
-   502                                  	;;C's offset
-   503 000002B9 8B542428                	mov edx,[esp+40]
-   504 000002BD 83EA01                  	sub edx,1
-   505 000002C0 0FAF542424              	imul edx,[esp+36]
-   506 000002C5 0354242C                	add edx,[esp+44]
-   507 000002C9 6BD204                  	imul edx,4
-   508 000002CC 8915[AF000000]          	mov [cOff],edx
-   509                                  	
-   510                                  out_1:
-   511                                  
-   512                                  	;outer loop
-   513                                  out_2:
-   514                                  
-   515                                  	;inner loop
-   516                                  
-   517                                  	;current B off
-   518 000002D2 A1[9B000000]            	mov eax,[loop_j]
-   519 000002D7 6BC004                  	imul eax,4
-   520 000002DA 03442408                	add eax,[esp+8]
-   521 000002DE 0305[AB000000]          	add eax,[bOff]
-   522 000002E4 A3[A3000000]            	mov dword [bVec],eax
-   523                                  
-   524                                  	;current A off
-   525 000002E9 A1[97000000]            	mov eax,[loop_i]
-   526 000002EE 0FAF442424              	imul eax,[esp+36]
-   527 000002F3 6BC004                  	imul eax,4
-   528 000002F6 03442404                	add eax,[esp+4]
-   529 000002FA 0305[A7000000]          	add eax,[aOff]
-   530 00000300 A3[9F000000]            	mov dword [aVec],eax
+   484                                  
+   485                                  exit_error_noerror:
+   486 000002A8 C3                      	ret;;
+   487                                  
+   488                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   489                                  
+   490                                  mult_mat_2d:
+   491                                  	
+   492                                  	;args a[],b[],n,C[],ia,ja,ib,jb,Wid,ic,jc
+   493                                  	;here  (ij) is the location of blocks A and B wrt to parent matrices
+   494                                  	;Wid is the Width of parent matrix
+   495                                  	;Work under assumption that it is a square
+   496                                  	; A,B,C are the references of parent matrices only
+   497                                  	
+   498 000002A9 8B44240C                	mov eax,[esp+12]
+   499 000002AD 83E801                  	sub eax,1
+   500                                  
+   501 000002B0 A3[97000000]            	mov dword [loop_i],eax
+   502 000002B5 A3[9B000000]            	mov dword [loop_j],eax
+   503                                  	;done with setting loop variables
+   504                                  	;push and pop eax for counter ops
+   505                                  	
+   506                                  	;find offset
+   507                                  	
+   508                                  	;;A's offset
+   509 000002BA 8B542414                	mov edx,[esp+20]
+   510 000002BE 83EA01                  	sub edx,1
+   511 000002C1 0FAF542424              	imul edx,[esp+36]
+   512 000002C6 03542418                	add edx,[esp+24]
+   513 000002CA 6BD204                  	imul edx,4
+   514 000002CD 8915[A7000000]          	mov [aOff],edx
+   515                                  	
+   516                                  	;;B's offset
+   517 000002D3 8B54241C                	mov edx,[esp+28]
+   518 000002D7 83EA01                  	sub edx,1
+   519 000002DA 0FAF542424              	imul edx,[esp+36]
+   520 000002DF 03542420                	add edx,[esp+32]
+   521 000002E3 6BD204                  	imul edx,4
+   522 000002E6 8915[AB000000]          	mov [bOff],edx
+   523                                  	
+   524                                  	;;C's offset
+   525 000002EC 8B542428                	mov edx,[esp+40]
+   526 000002F0 83EA01                  	sub edx,1
+   527 000002F3 0FAF542424              	imul edx,[esp+36]
+   528 000002F8 0354242C                	add edx,[esp+44]
+   529 000002FC 6BD204                  	imul edx,4
+   530 000002FF 8915[AF000000]          	mov [cOff],edx
    531                                  	
-   532                                  	;;;row multiplication ops here...
-   533                                  	
-   534 00000305 BB00000000              	mov ebx,0
-   535 0000030A 8B4C240C                	mov ecx,[esp+12]
-   536 0000030E 83E901                  	sub ecx,1
-   537                                  	
-   538                                  out_3:	
-   539 00000311 89C8                    	mov eax,ecx
-   540 00000313 0FAF442424              	imul eax,[esp+36]
-   541 00000318 6BC004                  	imul eax,4
-   542 0000031B 0305[A3000000]          	add dword eax,[bVec]
-   543 00000321 8B10                    	mov edx,[eax]
-   544                                  
-   545 00000323 A1[9F000000]            	mov eax,[aVec]
-   546 00000328 51                      	push ecx
-   547 00000329 6BC904                  	imul ecx,4
-   548 0000032C 01C8                    	add eax,ecx
-   549 0000032E 59                      	pop ecx
-   550                                  
-   551 0000032F 0FAF10                  	imul edx,[eax]
-   552 00000332 01D3                    	add ebx,edx
-   553 00000334 83E901                  	sub ecx,1
-   554                                  	
-   555 00000337 83F900                  	cmp ecx,0
-   556 0000033A 7DD5                    	jge out_3
-   557                                  
-   558                                  out_3_exit:
+   532                                  out_1:
+   533                                  
+   534                                  	;outer loop
+   535                                  out_2:
+   536                                  
+   537                                  	;inner loop
+   538                                  
+   539                                  	;current B off
+   540 00000305 A1[9B000000]            	mov eax,[loop_j]
+   541 0000030A 6BC004                  	imul eax,4
+   542 0000030D 03442408                	add eax,[esp+8]
+   543 00000311 0305[AB000000]          	add eax,[bOff]
+   544 00000317 A3[A3000000]            	mov dword [bVec],eax
+   545                                  
+   546                                  	;current A off
+   547 0000031C A1[97000000]            	mov eax,[loop_i]
+   548 00000321 0FAF442424              	imul eax,[esp+36]
+   549 00000326 6BC004                  	imul eax,4
+   550 00000329 03442404                	add eax,[esp+4]
+   551 0000032D 0305[A7000000]          	add eax,[aOff]
+   552 00000333 A3[9F000000]            	mov dword [aVec],eax
+   553                                  	
+   554                                  	;;;row multiplication ops here...
+   555                                  	
+   556 00000338 BB00000000              	mov ebx,0
+   557 0000033D 8B4C240C                	mov ecx,[esp+12]
+   558 00000341 83E901                  	sub ecx,1
    559                                  	
-   560                                      ;;;end of row op...
-   561                                  	
-   562 0000033C 89DA                    	mov edx,ebx
-   563                                  
-   564                                  	;writing result of C
-   565 0000033E A1[97000000]            	mov eax,[loop_i]
-   566 00000343 0FAF442424              	imul eax,[esp+36]
-   567 00000348 8B1D[9B000000]          	mov ebx,[loop_j]
-   568 0000034E 01D8                    	add eax,ebx
-   569 00000350 6BC004                  	imul eax,4
-   570 00000353 0305[AF000000]          	add eax,[cOff]
-   571 00000359 03442410                	add eax,[esp+16]
-   572 0000035D 8910                    	mov [eax],edx
-   573                                  	
-   574 0000035F A1[9B000000]            	mov eax,[loop_j]
-   575 00000364 83E801                  	sub eax,1
-   576 00000367 A3[9B000000]            	mov dword [loop_j],eax
-   577                                  
-   578 0000036C 83F800                  	cmp eax,0
+   560                                  out_3:	
+   561 00000344 89C8                    	mov eax,ecx
+   562 00000346 0FAF442424              	imul eax,[esp+36]
+   563 0000034B 6BC004                  	imul eax,4
+   564 0000034E 0305[A3000000]          	add dword eax,[bVec]
+   565 00000354 8B10                    	mov edx,[eax]
+   566                                  
+   567 00000356 A1[9F000000]            	mov eax,[aVec]
+   568 0000035B 51                      	push ecx
+   569 0000035C 6BC904                  	imul ecx,4
+   570 0000035F 01C8                    	add eax,ecx
+   571 00000361 59                      	pop ecx
+   572                                  
+   573 00000362 0FAF10                  	imul edx,[eax]
+   574 00000365 01D3                    	add ebx,edx
+   575 00000367 83E901                  	sub ecx,1
+   576                                  	
+   577 0000036A 83F900                  	cmp ecx,0
+   578 0000036D 7DD5                    	jge out_3
    579                                  
-   580 0000036F 0F8D5DFFFFFF            	jge out_2
-   581                                  
-   582                                  out_2_end:
-   583                                  
-   584                                  
-   585 00000375 8B44240C                	mov eax,[esp+12]
-   586 00000379 83E801                  	sub eax,1
-   587 0000037C A3[9B000000]            	mov dword [loop_j],eax
-   588                                  
-   589 00000381 A1[97000000]            	mov eax,[loop_i]
-   590 00000386 83E801                  	sub eax,1
-   591 00000389 A3[97000000]            	mov [loop_i],eax
-   592                                  
-   593 0000038E 83F800                  	cmp eax,0
-   594                                  
-   595 00000391 0F8D3BFFFFFF            	jge out_1
-   596                                  
-   597                                  out_1_end:
-   598                                  
-   599 00000397 C3                      	ret;
-   600                                  	;end of the procedure
+   580                                  out_3_exit:
+   581                                  	
+   582                                      ;;;end of row op...
+   583                                  	
+   584 0000036F 89DA                    	mov edx,ebx
+   585                                  
+   586                                  	;writing result of C
+   587 00000371 A1[97000000]            	mov eax,[loop_i]
+   588 00000376 0FAF442424              	imul eax,[esp+36]
+   589 0000037B 8B1D[9B000000]          	mov ebx,[loop_j]
+   590 00000381 01D8                    	add eax,ebx
+   591 00000383 6BC004                  	imul eax,4
+   592 00000386 0305[AF000000]          	add eax,[cOff]
+   593 0000038C 03442410                	add eax,[esp+16]
+   594 00000390 8910                    	mov [eax],edx
+   595                                  	
+   596 00000392 A1[9B000000]            	mov eax,[loop_j]
+   597 00000397 83E801                  	sub eax,1
+   598 0000039A A3[9B000000]            	mov dword [loop_j],eax
+   599                                  
+   600 0000039F 83F800                  	cmp eax,0
    601                                  
-   602                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   602 000003A2 0F8D5DFFFFFF            	jge out_2
    603                                  
-   604                                  add_mat_2d:
-   605                                  	;arr A[],B[],n,C[],ia,ja,ib,jb,Wid,ic,jc
-   606                                  	;here  (ij) is the location of blocks A and B wrt to parent matrices
-   607                                  	;Wid is the Width of parent matrix
-   608                                  	;Work under assumption that it is a square
-   609                                  	; A,B,C are the references of parent matrices only
+   604                                  out_2_end:
+   605                                  
+   606                                  
+   607 000003A8 8B44240C                	mov eax,[esp+12]
+   608 000003AC 83E801                  	sub eax,1
+   609 000003AF A3[9B000000]            	mov dword [loop_j],eax
    610                                  
-   611                                  
-   612                                  	;find offset
-   613                                  	
-   614                                  	;;A's offset
-   615 00000398 8B542414                	mov edx,[esp+20]
-   616 0000039C 83EA01                  	sub edx,1
-   617 0000039F 0FAF542424              	imul edx,[esp+36]
-   618 000003A4 03542418                	add edx,[esp+24]
-   619 000003A8 6BD204                  	imul edx,4
-   620 000003AB 8915[B3000000]          	mov [aOff2],edx
-   621                                  	
-   622                                  	;;B's offset
-   623 000003B1 8B54241C                	mov edx,[esp+28]
-   624 000003B5 83EA01                  	sub edx,1
-   625 000003B8 0FAF542424              	imul edx,[esp+36]
-   626 000003BD 03542420                	add edx,[esp+32]
-   627 000003C1 6BD204                  	imul edx,4
-   628 000003C4 8915[B7000000]          	mov [bOff2],edx
-   629                                  	
-   630                                  	;;C's offset
-   631 000003CA 8B542428                	mov edx,[esp+40]
-   632 000003CE 83EA01                  	sub edx,1
-   633 000003D1 0FAF542424              	imul edx,[esp+36]
-   634 000003D6 0354242C                	add edx,[esp+44]
-   635 000003DA 6BD204                  	imul edx,4
-   636 000003DD 8915[BB000000]          	mov [cOff2],edx
-   637                                  	
-   638 000003E3 8B44240C                	mov eax,[esp+12]
-   639 000003E7 83E801                  	sub eax,1
-   640 000003EA A3[97000000]            	mov [loop_i],eax
-   641 000003EF A3[9B000000]            	mov [loop_j],eax
-   642                                  
-   643                                  out_1a:
-   644                                  	
-   645                                  out_2a:
-   646                                  	
-   647                                  	;;addition logic
-   648                                  	
-   649                                  	;common offset
-   650 000003F4 8B1D[97000000]          	mov ebx,[loop_i]
-   651 000003FA 0FAF5C2424              	imul ebx,[esp+36]
-   652 000003FF 031D[9B000000]          	add ebx,[loop_j]
-   653 00000405 6BDB04                  	imul ebx,4
-   654                                  
-   655                                  	;get B[]
-   656 00000408 8B4C2408                	mov ecx,[esp+8]
-   657 0000040C 01D9                    	add ecx,ebx
-   658 0000040E 030D[B7000000]          	add ecx,[bOff2]
-   659 00000414 8B01                    	mov eax,[ecx]
-   660                                  
-   661                                  	;add A[]
-   662 00000416 8B4C2404                	mov ecx,[esp+4]
-   663 0000041A 01D9                    	add ecx,ebx
-   664 0000041C 030D[B3000000]          	add ecx,[aOff2]
-   665 00000422 0301                    	add eax,[ecx]
-   666                                  
-   667                                  	;store to C[]
-   668 00000424 8B4C2410                	mov ecx,[esp+16]
-   669 00000428 01D9                    	add ecx,ebx
-   670 0000042A 030D[BB000000]          	add ecx,[cOff2]
-   671 00000430 8901                    	mov [ecx],eax
-   672                                  
-   673                                  	;;end of addition
-   674                                  
-   675 00000432 A1[9B000000]            	mov eax,[loop_j]
-   676 00000437 83E801                  	sub eax,1
-   677 0000043A A3[9B000000]            	mov [loop_j],eax
-   678                                  
-   679 0000043F 83F800                  	cmp eax,0
-   680 00000442 0F8D8AFEFFFF            	jge out_2
-   681                                  
-   682                                  out_2a_end:
-   683                                  	
-   684 00000448 8B44240C                	mov eax,[esp+12]
-   685 0000044C 83E801                  	sub eax,1
-   686 0000044F A3[9B000000]            	mov [loop_j],eax
-   687                                  
-   688 00000454 A1[97000000]            	mov eax,[loop_i]
-   689 00000459 83E801                  	sub eax,1
-   690 0000045C A3[97000000]            	mov [loop_i],eax
-   691                                  
-   692 00000461 83F800                  	cmp eax,0
-   693 00000464 0F8D68FEFFFF            	jge out_1
+   611 000003B4 A1[97000000]            	mov eax,[loop_i]
+   612 000003B9 83E801                  	sub eax,1
+   613 000003BC A3[97000000]            	mov [loop_i],eax
+   614                                  
+   615 000003C1 83F800                  	cmp eax,0
+   616                                  
+   617 000003C4 0F8D3BFFFFFF            	jge out_1
+   618                                  
+   619                                  out_1_end:
+   620                                  
+   621 000003CA C3                      	ret;
+   622                                  	;end of the procedure
+   623                                  
+   624                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   625                                  
+   626                                  add_mat_2d:
+   627                                  	;arr A[],B[],n,C[],ia,ja,ib,jb,Wid,ic,jc
+   628                                  	;here  (ij) is the location of blocks A and B wrt to parent matrices
+   629                                  	;Wid is the Width of parent matrix
+   630                                  	;Work under assumption that it is a square
+   631                                  	; A,B,C are the references of parent matrices only
+   632                                  
+   633                                  
+   634                                  	;find offset
+   635                                  	
+   636                                  	;;A's offset
+   637 000003CB 8B542414                	mov edx,[esp+20]
+   638 000003CF 83EA01                  	sub edx,1
+   639 000003D2 0FAF542424              	imul edx,[esp+36]
+   640 000003D7 03542418                	add edx,[esp+24]
+   641 000003DB 6BD204                  	imul edx,4
+   642 000003DE 8915[B3000000]          	mov [aOff2],edx
+   643                                  	
+   644                                  	;;B's offset
+   645 000003E4 8B54241C                	mov edx,[esp+28]
+   646 000003E8 83EA01                  	sub edx,1
+   647 000003EB 0FAF542424              	imul edx,[esp+36]
+   648 000003F0 03542420                	add edx,[esp+32]
+   649 000003F4 6BD204                  	imul edx,4
+   650 000003F7 8915[B7000000]          	mov [bOff2],edx
+   651                                  	
+   652                                  	;;C's offset
+   653 000003FD 8B542428                	mov edx,[esp+40]
+   654 00000401 83EA01                  	sub edx,1
+   655 00000404 0FAF542424              	imul edx,[esp+36]
+   656 00000409 0354242C                	add edx,[esp+44]
+   657 0000040D 6BD204                  	imul edx,4
+   658 00000410 8915[BB000000]          	mov [cOff2],edx
+   659                                  	
+   660 00000416 8B44240C                	mov eax,[esp+12]
+   661 0000041A 83E801                  	sub eax,1
+   662 0000041D A3[97000000]            	mov [loop_i],eax
+   663 00000422 A3[9B000000]            	mov [loop_j],eax
+   664                                  
+   665                                  out_1a:
+   666                                  	
+   667                                  out_2a:
+   668                                  	
+   669                                  	;;addition logic
+   670                                  	
+   671                                  	;common offset
+   672 00000427 8B1D[97000000]          	mov ebx,[loop_i]
+   673 0000042D 0FAF5C2424              	imul ebx,[esp+36]
+   674 00000432 031D[9B000000]          	add ebx,[loop_j]
+   675 00000438 6BDB04                  	imul ebx,4
+   676                                  
+   677                                  	;get B[]
+   678 0000043B 8B4C2408                	mov ecx,[esp+8]
+   679 0000043F 01D9                    	add ecx,ebx
+   680 00000441 030D[B7000000]          	add ecx,[bOff2]
+   681 00000447 8B01                    	mov eax,[ecx]
+   682                                  
+   683                                  	;add A[]
+   684 00000449 8B4C2404                	mov ecx,[esp+4]
+   685 0000044D 01D9                    	add ecx,ebx
+   686 0000044F 030D[B3000000]          	add ecx,[aOff2]
+   687 00000455 0301                    	add eax,[ecx]
+   688                                  
+   689                                  	;store to C[]
+   690 00000457 8B4C2410                	mov ecx,[esp+16]
+   691 0000045B 01D9                    	add ecx,ebx
+   692 0000045D 030D[BB000000]          	add ecx,[cOff2]
+   693 00000463 8901                    	mov [ecx],eax
    694                                  
-   695                                  out_1a_end:
+   695                                  	;;end of addition
    696                                  
-   697 0000046A C3                      	ret;
-   698                                  	;end of addition
-   699                                  
-   700                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   701                                  
-   702                                  trans_mat_2d:
-   703                                  	;args - A[],N
-   704                                  	
-   705 0000046B 8B442408                	mov eax,[esp+8]
-   706                                  
-   707 0000046F C705[97000000]0000-     	mov dword [loop_i],0
-   708 00000477 0000               
-   709 00000479 C705[9B000000]0000-     	mov dword [loop_j],0
-   710 00000481 0000               
-   711                                  
-   712                                  tl_1:
+   697 00000465 A1[9B000000]            	mov eax,[loop_j]
+   698 0000046A 83E801                  	sub eax,1
+   699 0000046D A3[9B000000]            	mov [loop_j],eax
+   700                                  
+   701 00000472 83F800                  	cmp eax,0
+   702 00000475 0F8D8AFEFFFF            	jge out_2
+   703                                  
+   704                                  out_2a_end:
+   705                                  	
+   706 0000047B 8B44240C                	mov eax,[esp+12]
+   707 0000047F 83E801                  	sub eax,1
+   708 00000482 A3[9B000000]            	mov [loop_j],eax
+   709                                  
+   710 00000487 A1[97000000]            	mov eax,[loop_i]
+   711 0000048C 83E801                  	sub eax,1
+   712 0000048F A3[97000000]            	mov [loop_i],eax
    713                                  
-   714                                  tl_2:
-   715                                  	
-   716                                  	;swap here
-   717                                  
-   718 00000483 A1[97000000]            	mov eax,[loop_i]
-   719 00000488 0FAF442408              	imul eax,[esp+8]
-   720 0000048D 0305[9B000000]          	add eax,[loop_j]
-   721 00000493 6BC004                  	imul eax,4
-   722 00000496 03442404                	add eax,[esp+4]
-   723 0000049A 8B18                    	mov ebx,[eax]
-   724                                  	
-   725 0000049C 8B0D[9B000000]          	mov ecx,[loop_j]
-   726 000004A2 0FAF4C2408              	imul ecx,[esp+8]
-   727 000004A7 030D[97000000]          	add ecx,[loop_i]
-   728 000004AD 6BC904                  	imul ecx,4
-   729 000004B0 034C2404                	add ecx,[esp+4]
-   730 000004B4 8B11                    	mov edx,[ecx]
-   731                                  	
-   732 000004B6 8910                    	mov [eax],edx
-   733 000004B8 8919                    	mov [ecx],ebx
-   734                                  
-   735                                  	;end swapping
+   714 00000494 83F800                  	cmp eax,0
+   715 00000497 0F8D68FEFFFF            	jge out_1
+   716                                  
+   717                                  out_1a_end:
+   718                                  
+   719 0000049D C3                      	ret;
+   720                                  	;end of addition
+   721                                  
+   722                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   723                                  
+   724                                  trans_mat_2d:
+   725                                  	;args - A[],N
+   726                                  	
+   727 0000049E B800000000              	mov eax,0
+   728 000004A3 A3[97000000]            	mov [loop_i],eax
+   729 000004A8 A3[9B000000]            	mov [loop_j],eax
+   730                                  
+   731                                  tl_1:
+   732                                  
+   733                                  tl_2:
+   734                                  	
+   735                                  	;swap here
    736                                  
-   737                                  
-   738 000004BA A1[9B000000]            	mov eax,[loop_j]
-   739 000004BF 83C001                  	add eax,1
-   740 000004C2 A3[9B000000]            	mov [loop_j],eax
-   741                                  
-   742 000004C7 8B1D[97000000]          	mov ebx,[loop_i]
-   743 000004CD 39D8                    	cmp eax,ebx
-   744 000004CF 7EB2                    	jle tl_2
-   745                                  
-   746                                  tl2_out:
-   747                                  
-   748 000004D1 C705[9B000000]0000-     	mov dword [loop_j],0
-   749 000004D9 0000               
-   750                                  
-   751 000004DB A1[97000000]            	mov eax,[loop_i]
-   752 000004E0 83C001                  	add eax,1
-   753 000004E3 A3[97000000]            	mov [loop_i],eax
-   754                                  
-   755 000004E8 8B5C2408                	mov ebx,[esp+8]
-   756 000004EC 39D8                    	cmp eax,ebx
-   757                                  
-   758 000004EE 7C93                    	jl tl_1
-   759                                  
-   760                                  tl1_out:
-   761                                  
-   762 000004F0 C3                      	ret;;
-   763                                  
+   737 000004AD A1[97000000]            	mov eax,[loop_i]
+   738 000004B2 0FAF442408              	imul eax,[esp+8]
+   739 000004B7 0305[9B000000]          	add eax,[loop_j]
+   740 000004BD 6BC004                  	imul eax,4
+   741 000004C0 03442404                	add eax,[esp+4]
+   742 000004C4 8B18                    	mov ebx,[eax]
+   743                                  	
+   744 000004C6 8B0D[9B000000]          	mov ecx,[loop_j]
+   745 000004CC 0FAF4C2408              	imul ecx,[esp+8]
+   746 000004D1 030D[97000000]          	add ecx,[loop_i]
+   747 000004D7 6BC904                  	imul ecx,4
+   748 000004DA 034C2404                	add ecx,[esp+4]
+   749 000004DE 8B11                    	mov edx,[ecx]
+   750                                  	
+   751 000004E0 8910                    	mov [eax],edx
+   752 000004E2 8919                    	mov [ecx],ebx
+   753                                  
+   754                                  	;end swapping
+   755                                  
+   756                                  
+   757 000004E4 A1[9B000000]            	mov eax,[loop_j]
+   758 000004E9 83C001                  	add eax,1
+   759 000004EC A3[9B000000]            	mov [loop_j],eax
+   760                                  
+   761 000004F1 8B1D[97000000]          	mov ebx,[loop_i]
+   762 000004F7 39D8                    	cmp eax,ebx
+   763 000004F9 7EB2                    	jle tl_2
+   764                                  
+   765                                  tl2_out:
+   766                                  	
+   767 000004FB B800000000              	mov eax,0
+   768 00000500 A3[9B000000]            	mov [loop_j],eax
+   769                                  
+   770 00000505 A1[97000000]            	mov eax,[loop_i]
+   771 0000050A 83C001                  	add eax,1
+   772 0000050D A3[97000000]            	mov [loop_i],eax
+   773                                  
+   774 00000512 8B5C2408                	mov ebx,[esp+8]
+   775 00000516 39D8                    	cmp eax,ebx
+   776                                  
+   777 00000518 7C93                    	jl tl_1
+   778                                  
+   779                                  tl1_out:
+   780                                  
+   781 0000051A C3                      	ret;;
+   782                                  
