@@ -76,7 +76,7 @@ main:
     push eax
 
 	;N
-	mov eax,2
+	mov eax,4
 	push eax
 
 	;D
@@ -88,7 +88,7 @@ main:
 	push eax
 
 	;B
-	mov eax,arr5
+	mov eax,arr2
 	push eax
 
 	;A
@@ -645,3 +645,63 @@ out_1a_end:
 	;end of addition
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+trans_mat_2d:
+	;args - A[],N
+	
+	mov eax,[esp+8]
+
+	mov dword [loop_i],0
+	mov dword [loop_j],0
+
+tl_1:
+
+tl_2:
+	
+	;swap here
+
+	mov eax,[loop_i]
+	imul eax,[esp+8]
+	add eax,[loop_j]
+	imul eax,4
+	add eax,[esp+4]
+	mov ebx,[eax]
+	
+	mov ecx,[loop_j]
+	imul ecx,[esp+8]
+	add ecx,[loop_i]
+	imul ecx,4
+	add ecx,[esp+4]
+	mov edx,[ecx]
+	
+	mov [eax],edx
+	mov [ecx],ebx
+
+	;end swapping
+
+
+	mov eax,[loop_j]
+	add eax,1
+	mov [loop_j],eax
+
+	mov ebx,[loop_i]
+	cmp eax,ebx
+	jle tl_2
+
+tl2_out:
+
+	mov dword [loop_j],0
+
+	mov eax,[loop_i]
+	add eax,1
+	mov [loop_i],eax
+
+	mov ebx,[esp+8]
+	cmp eax,ebx
+
+	jl tl_1
+
+tl1_out:
+
+	ret;;
+

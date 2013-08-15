@@ -129,7 +129,7 @@
    129 00000016 50                          push eax
    130                                  
    131                                  	;N
-   132 00000017 B802000000              	mov eax,2
+   132 00000017 B804000000              	mov eax,4
    133 0000001C 50                      	push eax
    134                                  
    135                                  	;D
@@ -141,7 +141,7 @@
    141 00000028 50                      	push eax
    142                                  
    143                                  	;B
-   144 00000029 B8[56000000]            	mov eax,arr5
+   144 00000029 B8[26000000]            	mov eax,arr2
    145 0000002E 50                      	push eax
    146                                  
    147                                  	;A
@@ -698,3 +698,66 @@
    698                                  	;end of addition
    699                                  
    700                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   701                                  
+   702                                  trans_mat_2d:
+   703                                  	;args - A[],N
+   704                                  	
+   705 0000046B 8B442408                	mov eax,[esp+8]
+   706                                  
+   707 0000046F C705[97000000]0000-     	mov dword [loop_i],0
+   708 00000477 0000               
+   709 00000479 C705[9B000000]0000-     	mov dword [loop_j],0
+   710 00000481 0000               
+   711                                  
+   712                                  tl_1:
+   713                                  
+   714                                  tl_2:
+   715                                  	
+   716                                  	;swap here
+   717                                  
+   718 00000483 A1[97000000]            	mov eax,[loop_i]
+   719 00000488 0FAF442408              	imul eax,[esp+8]
+   720 0000048D 0305[9B000000]          	add eax,[loop_j]
+   721 00000493 6BC004                  	imul eax,4
+   722 00000496 03442404                	add eax,[esp+4]
+   723 0000049A 8B18                    	mov ebx,[eax]
+   724                                  	
+   725 0000049C 8B0D[9B000000]          	mov ecx,[loop_j]
+   726 000004A2 0FAF4C2408              	imul ecx,[esp+8]
+   727 000004A7 030D[97000000]          	add ecx,[loop_i]
+   728 000004AD 6BC904                  	imul ecx,4
+   729 000004B0 034C2404                	add ecx,[esp+4]
+   730 000004B4 8B11                    	mov edx,[ecx]
+   731                                  	
+   732 000004B6 8910                    	mov [eax],edx
+   733 000004B8 8919                    	mov [ecx],ebx
+   734                                  
+   735                                  	;end swapping
+   736                                  
+   737                                  
+   738 000004BA A1[9B000000]            	mov eax,[loop_j]
+   739 000004BF 83C001                  	add eax,1
+   740 000004C2 A3[9B000000]            	mov [loop_j],eax
+   741                                  
+   742 000004C7 8B1D[97000000]          	mov ebx,[loop_i]
+   743 000004CD 39D8                    	cmp eax,ebx
+   744 000004CF 7EB2                    	jle tl_2
+   745                                  
+   746                                  tl2_out:
+   747                                  
+   748 000004D1 C705[9B000000]0000-     	mov dword [loop_j],0
+   749 000004D9 0000               
+   750                                  
+   751 000004DB A1[97000000]            	mov eax,[loop_i]
+   752 000004E0 83C001                  	add eax,1
+   753 000004E3 A3[97000000]            	mov [loop_i],eax
+   754                                  
+   755 000004E8 8B5C2408                	mov ebx,[esp+8]
+   756 000004EC 39D8                    	cmp eax,ebx
+   757                                  
+   758 000004EE 7C93                    	jl tl_1
+   759                                  
+   760                                  tl1_out:
+   761                                  
+   762 000004F0 C3                      	ret;;
+   763                                  
