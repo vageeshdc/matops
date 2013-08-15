@@ -12,6 +12,8 @@ SECTION .data
 	
 	arr2: dd 1,2,3,4
 	arr3: dd 0,0,0,0
+	arr4: dd 0,0,0,0
+	arr5: dd 1,0,0,1
 
 	format: db " | %d ",0
 	format2: db " | ",10,0
@@ -30,6 +32,10 @@ SECTION .data
 	bOff: dd 0
 	cOff: dd 0
 
+	aOff2: dd 0
+	bOff2: dd 0
+	cOff2: dd 0
+
 	lop_i: dd 0
 	lop_j: dd 0
 	lop_k: dd 0
@@ -43,6 +49,8 @@ SECTION .data
 
 	AA: dd 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
 	BB: dd 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+	BB1: dd 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1
+	BB2: dd 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
 	CC: dd 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
@@ -68,23 +76,23 @@ main:
     push eax
 
 	;N
-	mov eax,4
+	mov eax,2
 	push eax
 
 	;D
-	mov eax,DD
+	mov eax,arr3
 	push eax
 
 	;C
-	mov eax,CC
+	mov eax,arr4
 	push eax
 
 	;B
-	mov eax,BB
+	mov eax,arr5
 	push eax
 
 	;A
-	mov eax,AA
+	mov eax,arr2
 	push eax
 
 	call mult_block_2d
@@ -107,7 +115,7 @@ print_timer:
 
 	;; print the matrix C
 
-	mov eax,4
+	mov eax,2
 	mov [lop_i],eax
 
 	mov ebx,0
@@ -124,7 +132,7 @@ pl2:
 	imul ecx,[lop_i]
 	add ecx,[loop_j]
 	imul ecx,4
-	add ecx,CC
+	add ecx,arr4
 	
 	mov eax,[ecx]
 	push eax
@@ -547,18 +555,7 @@ add_mat_2d:
 	;Work under assumption that it is a square
 	; A,B,C are the references of parent matrices only
 
-	mov eax,[esp+12]
-	sub eax,1
 
-	mov [loop_i],eax
-	mov [loop_j],eax
-
-out_1a:
-	
-out_2a:
-	
-	;;addition logic
-	
 	;find offset
 	
 	;;A's offset
@@ -567,7 +564,7 @@ out_2a:
 	imul edx,[esp+36]
 	add edx,[esp+24]
 	imul edx,4
-	mov [aOff],edx
+	mov [aOff2],edx
 	
 	;;B's offset
 	mov edx,[esp+28]
@@ -575,7 +572,7 @@ out_2a:
 	imul edx,[esp+36]
 	add edx,[esp+32]
 	imul edx,4
-	mov [bOff],edx
+	mov [bOff2],edx
 	
 	;;C's offset
 	mov edx,[esp+40]
@@ -583,7 +580,18 @@ out_2a:
 	imul edx,[esp+36]
 	add edx,[esp+44]
 	imul edx,4
-	mov [cOff],edx
+	mov [cOff2],edx
+	
+	mov eax,[esp+12]
+	sub eax,1
+	mov [loop_i],eax
+	mov [loop_j],eax
+
+out_1a:
+	
+out_2a:
+	
+	;;addition logic
 	
 	;common offset
 	mov ebx,[loop_i]
@@ -594,19 +602,19 @@ out_2a:
 	;get B[]
 	mov ecx,[esp+8]
 	add ecx,ebx
-	add ecx,[bOff]
+	add ecx,[bOff2]
 	mov eax,[ecx]
 
 	;add A[]
 	mov ecx,[esp+4]
 	add ecx,ebx
-	add ecx,[aOff]
+	add ecx,[aOff2]
 	add eax,[ecx]
 
 	;store to C[]
 	mov ecx,[esp+16]
 	add ecx,ebx
-	add ecx,[cOff]
+	add ecx,[cOff2]
 	mov [ecx],eax
 
 	;;end of addition
