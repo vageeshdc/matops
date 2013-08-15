@@ -54,7 +54,38 @@ SECTION .data
 
 	CC: dd 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
-	DD: dd 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	DD: dd 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+
+	i1: dd 0
+	j1: dd 0
+	k1: dd 0
+	k1_t: dd 0
+
+	i2: dd 0
+	j2: dd 0
+	k2: dd 0
+	ia2: dd 0
+	ja2: dd 0
+	ib2: dd 0
+	jb2: dd 0
+	ic2: dd 0
+	jc2: dd 0
+	k2_t: dd 0
+	av2: dd 0
+	bv2: dd 0
+	cv2: dd 0
+
+	i3: dd 0
+	j3: dd 0
+	k3: dd 0
+
+	W1: dd 0
+	W2: dd 0
+	W3: dd 0
+
+	bi: dd 0
+	bj: dd 0
+	bk: dd 0
 
 SECTION .text
 	global main
@@ -85,11 +116,27 @@ main:
 	call trans_mat_2d
 	;end of transpose
 
-	;b
+	;bj
 	mov eax,2
+	push eax
+
+	;bk
+	mov eax,2
+	push eax
+	
+	;bi
+	mov eax,2
+	push eax
+
+	;j
+	mov eax,4
+	push eax
+
+	;k
+	mov eax,4
     push eax
 
-	;N
+	;i
 	mov eax,4
 	push eax
 
@@ -202,11 +249,11 @@ pl1_out:
 
 mult_block_2d:
 
-	;the params are A[],B[],C[],D[],N,b
+	;the params are A[],B[],C[],D[],i,k,j,bi,bk,bj
 	; A,B are the ip C is the OP
-	; D is the dummy 
-	; N is the dimension
-	; b is the block parameter
+	; D is the dummy iX[jXk]
+	; i j k is the dimension
+	; bi bj is the block parameter
 
 	mov eax,[esp+4]
 	mov [Av],eax
@@ -221,19 +268,50 @@ mult_block_2d:
 	mov [Dv],eax
 
 	mov eax,[esp+20]
-	mov [Nval],eax
+	mov [i1],eax
 
 	mov eax,[esp+24]
-	mov [Bval],eax
+	mov [k1],eax
+	
+	mov eax,[esp+28]
+	mov [j1],eax
 
-	mov eax,[Nval]
-	mov ecx,[Bval]
+	mov eax,[esp+32]
+	mov [bi],eax
+
+	mov eax,[esp+36]
+	mov [bk],eax
+
+	mov eax,[esp+40]
+	mov [bj],eax
+
+	mov eax,[i1]
+	mov ecx,[bi]
 	mov edx,0
 	;donr specifically
 	div ecx
 
 	cmp edx,0
 	jne exit_error_noerror
+
+	mov eax,[j1]
+	mov ecx,[bj]
+	mov edx,0
+	;donr specifically
+	div ecx
+
+	cmp edx,0
+	jne exit_error_noerror
+
+	mov eax,[k1]
+	mov ecx,[bk]
+	mov edx,0
+	;donr specifically
+	div ecx
+
+	cmp edx,0
+	jne exit_error_noerror
+
 
 	;use lop_i,lop_j,lop_k
 	;ind ia ja ib jb ic jc id jd
@@ -253,16 +331,25 @@ l3:
 	
 	;;mult here
 	
+	;j
+	mov eax,[bj]
+	push eax
+
+	;k
+	mov eax,[bk]
+	push eax
+
+	;i
+	mov eax,[bi]
+	push eax
+
 	;jc
 	mov eax,[lop_k]
+	imul eax,[j1]
 	push eax
 
 	;ic
 	mov eax,0
-	push eax
-
-	;Wid
-	mov eax,[Nval]
 	push eax
 
 	;jb
@@ -283,10 +370,6 @@ l3:
 
 	;C
 	mov eax,[Dv]
-	push eax
-
-	;n
-	mov eax,[Bval]
 	push eax
 
 	;b
@@ -313,13 +396,14 @@ l3:
 	pop eax	
 	pop eax	
 	pop eax	
-	
+	pop eax
+
 	;loop management
 	mov eax,[lop_k]
-	add eax,[Bval]
+	add eax,[bk]
 	mov [lop_k],eax
 
-	cmp eax,[Nval]
+	cmp eax,[k1]
 	jl l3
 
 l3_out:
@@ -333,6 +417,14 @@ l4:
 
 	;; push ops
 
+	;j
+	mov eax,[bj]
+	push eax
+
+	;i
+	mov eax,[bi]
+	push eax
+
 	;jc
 	mov eax,[lop_j]
 	push eax
@@ -341,40 +433,33 @@ l4:
 	mov eax,[lop_i]
 	push eax
 
-	;Wid
-	mov eax,[Nval]
-	push eax
-
 	;jb
-	mov eax,[lop_j]
+	mov eax,[lop_k]
+	imul eax,[j1]
 	push eax
 
 	;ib
-	mov eax,[lop_i]
+	mov eax,0
 	push eax
 
 	;ja
-	mov eax,[lop_k]
+	mov eax,[lop_j]
 	push eax
 
 	;ia
-	mov eax,0
+	mov eax,[lop_i]
 	push eax
 
 	;C
 	mov eax,[Cv]
 	push eax
 
-	;n
-	mov eax,[Bval]
-	push eax
-
 	;b
-	mov eax,[Cv]
+	mov eax,[Dv]
 	push eax
 
 	;a
-	mov eax,[Dv]
+	mov eax,[Cv]
 	push eax
 
 	;; call
@@ -395,10 +480,10 @@ l4:
 	pop eax	
 
 	mov eax,[lop_k]
-	add eax,[Bval]
+	add eax,[bk]
 	mov [lop_k],eax
 
-	cmp eax,[Nval]
+	cmp eax,[k1]
 	jl l4
 
 l4_out:
@@ -408,10 +493,10 @@ l4_out:
 
 
 	mov eax,[lop_j]
-	add eax,[Bval]
+	add eax,[bj]
 	mov [lop_j],eax
 
-	cmp eax,[Nval]
+	cmp eax,[j1]
 	jl l2
 
 l2_out:
@@ -420,10 +505,10 @@ l2_out:
 	mov [lop_j],eax
 
 	mov eax,[lop_i]
-	add eax,[Bval]
+	add eax,[bi]
 	mov [lop_i],eax
 
-	cmp eax,[Nval]
+	cmp eax,[i1]
 	jl l1
 
 l1_out:
@@ -436,43 +521,83 @@ exit_error_noerror:
 
 mult_mat_2d:
 	
-	;args a[],b[],n,C[],ia,ja,ib,jb,Wid,ic,jc
+	;args a[],b[],C[],ia,ja,ib,jb,ic,jc,i,k,j
 	;here  (ij) is the location of blocks A and B wrt to parent matrices
 	;Wid is the Width of parent matrix
 	;Work under assumption that it is a square
 	; A,B,C are the references of parent matrices only
-	
-	mov eax,[esp+12]
-	sub eax,1
 
+
+	mov eax,[esp+4]
+	mov [av2],eax
+
+	mov eax,[esp+8]
+	mov [bv2],eax
+
+	mov eax,[esp+12]
+	mov [cv2],eax
+
+	mov eax,[esp+16]
+	mov [ia2],eax
+
+	mov eax,[esp+20]
+	mov [ja2],eax
+
+	mov eax,[esp+24]
+	mov [ib2],eax
+
+	mov eax,[esp+28]
+	mov [jb2],eax
+
+	mov eax,[esp+32]
+	mov [ic2],eax
+
+	mov eax,[esp+36]
+	mov [jc2],eax
+
+	mov eax,[esp+40]
+	mov [i2],eax
+
+	mov eax,[esp+44]
+	mov [k2],eax
+
+	mov eax,[esp+48]
+	mov [j2],eax
+
+	mov eax,[i2]
+	sub eax,1
 	mov dword [loop_i],eax
+
+	mov eax,[j2]
+	sub eax,1
 	mov dword [loop_j],eax
+
 	;done with setting loop variables
 	;push and pop eax for counter ops
 	
 	;find offset
 	
 	;;A's offset
-	mov edx,[esp+20]
-	sub edx,1
-	imul edx,[esp+36]
-	add edx,[esp+24]
+	mov edx,[ia2]
+	;sub edx,1
+	imul edx,[k2]
+	add edx,[ja2]
 	imul edx,4
 	mov [aOff],edx
 	
 	;;B's offset
-	mov edx,[esp+28]
-	sub edx,1
-	imul edx,[esp+36]
-	add edx,[esp+32]
+	mov edx,[ib2]
+	;sub edx,1
+	imul edx,[j2]
+	add edx,[jb2]
 	imul edx,4
 	mov [bOff],edx
 	
 	;;C's offset
-	mov edx,[esp+40]
-	sub edx,1
-	imul edx,[esp+36]
-	add edx,[esp+44]
+	mov edx,[ic2]
+	;sub edx,1
+	imul edx,[j2]
+	add edx,[jc2]
 	imul edx,4
 	mov [cOff],edx
 	
@@ -486,27 +611,27 @@ out_2:
 	;current B off
 	mov eax,[loop_j]
 	imul eax,4
-	add eax,[esp+8]
+	add eax,[bv2]
 	add eax,[bOff]
 	mov dword [bVec],eax
 
 	;current A off
 	mov eax,[loop_i]
-	imul eax,[esp+36]
+	imul eax,[k2]
 	imul eax,4
-	add eax,[esp+4]
+	add eax,[av2]
 	add eax,[aOff]
 	mov dword [aVec],eax
 	
 	;;;row multiplication ops here...
 	
 	mov ebx,0
-	mov ecx,[esp+12]
+	mov ecx,[k2]
 	sub ecx,1
 	
 out_3:	
 	mov eax,ecx
-	imul eax,[esp+36]
+	imul eax,[j2]
 	imul eax,4
 	add dword eax,[bVec]
 	mov edx,[eax]
@@ -532,12 +657,12 @@ out_3_exit:
 
 	;writing result of C
 	mov eax,[loop_i]
-	imul eax,[esp+36]
+	imul eax,[j2]
 	mov ebx,[loop_j]
 	add eax,ebx
 	imul eax,4
 	add eax,[cOff]
-	add eax,[esp+16]
+	add eax,[cv2]
 	mov [eax],edx
 	
 	mov eax,[loop_j]
@@ -551,7 +676,7 @@ out_3_exit:
 out_2_end:
 
 
-	mov eax,[esp+12]
+	mov eax,[j2]
 	sub eax,1
 	mov dword [loop_j],eax
 
@@ -571,42 +696,76 @@ out_1_end:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 add_mat_2d:
-	;arr A[],B[],n,C[],ia,ja,ib,jb,Wid,ic,jc
+	;arr A[],B[],C[],ia,ja,ib,jb,ic,jc,i,j
 	;here  (ij) is the location of blocks A and B wrt to parent matrices
 	;Wid is the Width of parent matrix
 	;Work under assumption that it is a square
 	; A,B,C are the references of parent matrices only
 
 
+	mov eax,[esp+4]
+	mov [av2],eax
+
+	mov eax,[esp+8]
+	mov [bv2],eax
+
+	mov eax,[esp+12]
+	mov [cv2],eax
+
+	mov eax,[esp+16]
+	mov [ia2],eax
+
+	mov eax,[esp+20]
+	mov [ja2],eax
+
+	mov eax,[esp+24]
+	mov [ib2],eax
+
+	mov eax,[esp+28]
+	mov [jb2],eax
+
+	mov eax,[esp+32]
+	mov [ic2],eax
+
+	mov eax,[esp+36]
+	mov [jc2],eax
+
+	mov eax,[esp+40]
+	mov [i2],eax
+
+	mov eax,[esp+44]
+	mov [j2],eax
+
+
 	;find offset
 	
 	;;A's offset
-	mov edx,[esp+20]
-	sub edx,1
-	imul edx,[esp+36]
-	add edx,[esp+24]
+	mov edx,[ia2]
+	imul edx,[j2]
+	add edx,[ja2]
 	imul edx,4
 	mov [aOff2],edx
 	
 	;;B's offset
-	mov edx,[esp+28]
-	sub edx,1
-	imul edx,[esp+36]
-	add edx,[esp+32]
+	mov edx,[ib2]
+	imul edx,[j2]
+	add edx,[jb2]
 	imul edx,4
 	mov [bOff2],edx
 	
 	;;C's offset
-	mov edx,[esp+40]
-	sub edx,1
-	imul edx,[esp+36]
-	add edx,[esp+44]
+	mov edx,[ic2]
+	imul edx,[j2]
+	add edx,[jc2]
 	imul edx,4
 	mov [cOff2],edx
 	
-	mov eax,[esp+12]
+	mov eax,[i2]
 	sub eax,1
 	mov [loop_i],eax
+
+	mov eax,[j2]
+	sub eax,1
 	mov [loop_j],eax
 
 out_1a:
@@ -617,24 +776,24 @@ out_2a:
 	
 	;common offset
 	mov ebx,[loop_i]
-	imul ebx,[esp+36]
+	imul ebx,[j2]
 	add ebx,[loop_j]
 	imul ebx,4
 
 	;get B[]
-	mov ecx,[esp+8]
+	mov ecx,[bv2]
 	add ecx,ebx
 	add ecx,[bOff2]
 	mov eax,[ecx]
 
 	;add A[]
-	mov ecx,[esp+4]
+	mov ecx,[av2]
 	add ecx,ebx
 	add ecx,[aOff2]
 	add eax,[ecx]
 
 	;store to C[]
-	mov ecx,[esp+16]
+	mov ecx,[cv2]
 	add ecx,ebx
 	add ecx,[cOff2]
 	mov [ecx],eax
@@ -650,7 +809,7 @@ out_2a:
 
 out_2a_end:
 	
-	mov eax,[esp+12]
+	mov eax,[j2]
 	sub eax,1
 	mov [loop_j],eax
 
@@ -705,8 +864,7 @@ tl_2:
 	add eax,1
 	mov [loop_j],eax
 
-	mov ebx,[loop_i]
-	cmp eax,ebx
+	cmp eax,[loop_i]
 	jle tl_2
 
 tl2_out:
@@ -718,8 +876,7 @@ tl2_out:
 	add eax,1
 	mov [loop_i],eax
 
-	mov ebx,[esp+8]
-	cmp eax,ebx
+	cmp eax,[esp+8]
 
 	jl tl_1
 
