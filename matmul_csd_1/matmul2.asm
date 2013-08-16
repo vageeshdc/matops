@@ -54,7 +54,7 @@ SECTION .data
 
 	CC: dd 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
-	DD: dd 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	DD: dd 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
 	i1: dd 0
 	j1: dd 0
@@ -74,6 +74,9 @@ SECTION .data
 	av2: dd 0
 	bv2: dd 0
 	cv2: dd 0
+	bi2: dd 0
+	bj2: dd 0
+	bk2: dd 0
 
 	i3: dd 0
 	j3: dd 0
@@ -187,6 +190,9 @@ print_timer:
 	mov eax,4
 	mov [lop_i],eax
 
+	mov eax,4
+	mov [lop_j],eax
+
 	mov ebx,0
 	mov [loop_i],ebx
 	mov [loop_j],ebx
@@ -201,7 +207,7 @@ pl2:
 	imul ecx,[lop_i]
 	add ecx,[loop_j]
 	imul ecx,4
-	add ecx,arr4
+	add ecx,CC
 	
 	mov eax,[ecx]
 	push eax
@@ -216,7 +222,7 @@ pl2:
 	add ebx,1
 	mov [loop_j],ebx
 
-	cmp ebx,[lop_i]
+	cmp ebx,[lop_j]
 	jl pl2
 
 pl2_out:
@@ -331,25 +337,37 @@ l3:
 	
 	;;mult here
 	
-	;j
+	;bj
 	mov eax,[bj]
 	push eax
 
-	;k
+	;bk
 	mov eax,[bk]
 	push eax
 
-	;i
+	;bi
 	mov eax,[bi]
 	push eax
 
+	;j
+	mov eax,[j1]
+	push eax
+
+	;k
+	mov eax,[k1]
+	push eax
+
+	;i
+	mov eax,[i1]
+	push eax
+
 	;jc
-	mov eax,[lop_k]
-	imul eax,[j1]
+	mov eax,0
 	push eax
 
 	;ic
-	mov eax,0
+	mov eax,[lop_k]
+	imul eax,[bi]
 	push eax
 
 	;jb
@@ -397,6 +415,9 @@ l3:
 	pop eax	
 	pop eax	
 	pop eax
+	pop eax
+	pop eax
+	pop eax
 
 	;loop management
 	mov eax,[lop_k]
@@ -417,12 +438,20 @@ l4:
 
 	;; push ops
 
-	;j
+	;bj
 	mov eax,[bj]
 	push eax
 
-	;i
+	;bi
 	mov eax,[bi]
+	push eax
+
+	;j
+	mov eax,[j1]
+	push eax
+
+	;i
+	mov eax,[i1]
 	push eax
 
 	;jc
@@ -434,12 +463,12 @@ l4:
 	push eax
 
 	;jb
-	mov eax,[lop_k]
-	imul eax,[j1]
+	mov eax,0
 	push eax
 
 	;ib
-	mov eax,0
+	mov eax,[lop_k]
+	imul eax,[bi]
 	push eax
 
 	;ja
@@ -477,7 +506,9 @@ l4:
 	pop eax	
 	pop eax	
 	pop eax	
-	pop eax	
+	pop eax
+	pop eax
+	pop eax
 
 	mov eax,[lop_k]
 	add eax,[bk]
@@ -521,7 +552,7 @@ exit_error_noerror:
 
 mult_mat_2d:
 	
-	;args a[],b[],C[],ia,ja,ib,jb,ic,jc,i,k,j
+	;args a[],b[],C[],ia,ja,ib,jb,ic,jc,i,k,j,bi,bj,bk
 	;here  (ij) is the location of blocks A and B wrt to parent matrices
 	;Wid is the Width of parent matrix
 	;Work under assumption that it is a square
@@ -564,11 +595,20 @@ mult_mat_2d:
 	mov eax,[esp+48]
 	mov [j2],eax
 
-	mov eax,[i2]
+	mov eax,[esp+52]
+	mov [bi2],eax
+
+	mov eax,[esp+56]
+	mov [bk2],eax
+
+	mov eax,[esp+60]
+	mov [bj2],eax
+
+	mov eax,[bi2]
 	sub eax,1
 	mov dword [loop_i],eax
 
-	mov eax,[j2]
+	mov eax,[bj2]
 	sub eax,1
 	mov dword [loop_j],eax
 
@@ -626,7 +666,7 @@ out_2:
 	;;;row multiplication ops here...
 	
 	mov ebx,0
-	mov ecx,[k2]
+	mov ecx,[bk2]
 	sub ecx,1
 	
 out_3:	
@@ -676,7 +716,7 @@ out_3_exit:
 out_2_end:
 
 
-	mov eax,[j2]
+	mov eax,[bj2]
 	sub eax,1
 	mov dword [loop_j],eax
 
@@ -696,7 +736,7 @@ out_1_end:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 add_mat_2d:
-	;arr A[],B[],C[],ia,ja,ib,jb,ic,jc,i,j
+	;arr A[],B[],C[],ia,ja,ib,jb,ic,jc,i,j,bi,bj
 	;here  (ij) is the location of blocks A and B wrt to parent matrices
 	;Wid is the Width of parent matrix
 	;Work under assumption that it is a square
@@ -736,6 +776,11 @@ add_mat_2d:
 	mov eax,[esp+44]
 	mov [j2],eax
 
+	mov eax,[esp+48]
+	mov [bi2],eax
+
+	mov eax,[esp+52]
+	mov [bj2],eax
 
 	;find offset
 	
@@ -760,12 +805,10 @@ add_mat_2d:
 	imul edx,4
 	mov [cOff2],edx
 	
-	mov eax,[i2]
-	sub eax,1
+	mov eax,0
 	mov [loop_i],eax
 
-	mov eax,[j2]
-	sub eax,1
+	mov eax,0
 	mov [loop_j],eax
 
 out_1a:
@@ -790,7 +833,9 @@ out_2a:
 	mov ecx,[av2]
 	add ecx,ebx
 	add ecx,[aOff2]
-	add eax,[ecx]
+	mov edx,[ecx]
+
+	add eax,edx
 
 	;store to C[]
 	mov ecx,[cv2]
@@ -801,24 +846,23 @@ out_2a:
 	;;end of addition
 
 	mov eax,[loop_j]
-	sub eax,1
+	add eax,1
 	mov [loop_j],eax
 
-	cmp eax,0
-	jge out_2
+	cmp eax,[bj2]
+	jl out_2a
 
 out_2a_end:
 	
-	mov eax,[j2]
-	sub eax,1
+	mov eax,0
 	mov [loop_j],eax
 
 	mov eax,[loop_i]
-	sub eax,1
+	add eax,1
 	mov [loop_i],eax
 
-	cmp eax,0
-	jge out_1
+	cmp eax,[bi2]
+	jl out_1a
 
 out_1a_end:
 
