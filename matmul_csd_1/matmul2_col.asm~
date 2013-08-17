@@ -602,11 +602,11 @@ mult_mat_2d:
 
 	mov eax,[bi2]
 	sub eax,1
-	mov dword [loop_i],eax
+	mov dword [loop_j],eax
 
 	mov eax,[bj2]
 	sub eax,1
-	mov dword [loop_j],eax
+	mov dword [loop_i],eax
 
 	;done with setting loop variables
 	;push and pop eax for counter ops
@@ -645,14 +645,14 @@ out_2:
 	;inner loop
 
 	;current B off
-	mov eax,[loop_j]
+	mov eax,[loop_i]
 	imul eax,4
 	add eax,[bv2]
 	add eax,[bOff]
 	mov dword [bVec],eax
 
 	;current A off
-	mov eax,[loop_i]
+	mov eax,[loop_j]
 	imul eax,[k2]
 	imul eax,4
 	add eax,[av2]
@@ -692,18 +692,18 @@ out_3_exit:
 	mov edx,ebx
 
 	;writing result of C
-	mov eax,[loop_i]
+	mov eax,[loop_j]
 	imul eax,[j2]
-	mov ebx,[loop_j]
+	mov ebx,[loop_i]
 	add eax,ebx
 	imul eax,4
 	add eax,[cOff]
 	add eax,[cv2]
 	mov [eax],edx
 	
-	mov eax,[loop_j]
+	mov eax,[loop_i]
 	sub eax,1
-	mov dword [loop_j],eax
+	mov dword [loop_i],eax
 
 	cmp eax,0
 
@@ -714,11 +714,11 @@ out_2_end:
 
 	mov eax,[bj2]
 	sub eax,1
-	mov dword [loop_j],eax
+	mov dword [loop_i],eax
 
-	mov eax,[loop_i]
+	mov eax,[loop_j]
 	sub eax,1
-	mov [loop_i],eax
+	mov [loop_j],eax
 
 	cmp eax,0
 

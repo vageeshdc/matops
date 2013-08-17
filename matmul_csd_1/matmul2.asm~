@@ -122,6 +122,20 @@ main:
 	mov [CHval],edx
 	mov [CLval],eax
 
+	;transporse
+	mov eax,4
+	push eax
+	mov eax,AA
+	push eax
+	call trans_mat_2d
+
+	mov eax,4
+	push eax
+	mov eax,BB
+	push eax
+	call trans_mat_2d
+	;end of transpose
+
 	;bj
 	mov eax,30
 	push eax
@@ -163,6 +177,14 @@ main:
 	push eax
 
 	call mult_block_2d
+
+	;transporse
+	mov eax,4
+	push eax
+	mov eax,CC
+	push eax
+	call trans_mat_2d
+
 
 print_timer:
 	;;getting later time
