@@ -1,227 +1,183 @@
-SECTION .data
-    message1: db "Enter the matrix: ", 0
-    message3: db "Here: ", 0
-    message2: db "Enter the second number: ", 0
-    formatin: db "%d", 0
-    formatout: db "%d", 10, 0 ; newline, nul terminator
-    formatdet: db "Determinant of the Matrix is: %d", 10, 0 ; newline, nul terminator
-    integer1: times 4 db 0 ; 32-bits integer = 4 bytes
-    integer2: times 4 db 0 ;
-    mat: dd 6,4,5,7,8,9,0,0,0
-    a: dd 0;
-    b: dd 0;
-    c: dd 0;
-    add1: dd 0
-    add2: dd 0
-    detval: dd 0
-SEGMENT .bss
-    array1:  resd 10
-    array2:  resd 10
-    array3:  resd 10
-    array4:  resd 10
-    tmp: resd 1
-SECTION .text
-   global main 
-   extern scanf 
-   extern printf     
+;CSD Assignment 1
+;Problem: Inversion of a Matrix
+;Author: Pankaj (CS10B042)
+
+
+global main
+
+extern scanf
+extern printf
+
+section .data
+newline db "",10, 0
+formatin: db "%lf", 0
+formatout: db "%lf", 10, 0 
+formatdet: db "Determinant Value: %lf", 10, 0 
+formatdetzero: db "Determinant Value is Zero. Exiting.", 0
+
+fvr: dq 0
+tmp: dq 0
+tmp2: dd 0
+
+a: dq 0
+b: dq 0
+c: dq 0
+detval: dq 0
+
+
+section .bss
+
+array1: resq 9
+array2: resq 9
+array3: resq 9
+
+section .text
 
 main:
 
-   push ebx ; save registers
-   push ecx
-   push message1
-   call printf
-   add esp, 4 ; remove parameters
-
-
-
-
-
-;;;;;;   push integer1 ; address of integer1 (second parameter)
-
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;; Reading mat ;;;;;;;;;;;;;;;;;;;;;;;;;;
 readmat:
-   mov eax, 9;	
    mov ebx, 0;
-   mov [a], eax;
-   mov [b], ebx; 
-   
+
 inputMat:
-   
-   push add1;
-   push formatin ; arguments are right to left (first parameter)
-   call scanf
-   add esp, 8; removing parameter.
-   mov ecx, [add1]
-   
-   
-   mov [array1+ebx*4], ecx   
+   call readfloat
+   fstp qword [array1+ebx*8]
    inc ebx;
+   
+   cmp ebx, 9
+   jl inputMat
 
-   mov eax, [a]
-   sub eax, 1; 
-   mov [a], eax;   
-   cmp eax, [b];	
-
-   jne inputMat;
 ;;;;;;;;;;;;;;;;;;;;;;; Read mat over ;;;;;;;;;;;;;;;;;;;;;;
-
 
 ;;;;;;;;;;;;;;;;;;; Calculate mat determinant ;;;;;;;;;;;;;;
 
-mov ecx, 4
-mov eax, [array1+ecx*4] ; 5th element
-mov ecx, 8
-mov ebx, [array1+ecx*4] ; 9th element
-mul ebx			; 5th * 9th in eax
-
-mov [a], eax
-
 mov ecx, 7
-mov eax, [array1+ecx*4] ; 8th element
+fld qword [array1+ecx*8] ; 8th element
 mov ecx, 5
-mov ebx, [array1+ecx*4] ; 6th element
-mul ebx			; 8th * 6th in eax
+fmul qword [array1+ecx*8] ; 6th element 
+fstp qword [a]
 
-mov ebx, [a]
-sub ebx, eax
-mov [a], ebx
-;----------
-
-mov ecx, 3
-mov eax, [array1+ecx*4] ; 4th element
+mov ecx, 4
+fld qword [array1+ecx*8] ; 5th element
 mov ecx, 8
-mov ebx, [array1+ecx*4] ; 9th element
-mul ebx			; 4th * 9th in eax
+fmul qword [array1+ecx*8] ; 9th element
 
-mov [b], eax
+fsub qword[a]
+fstp qword [a]
+;-----------------
 
 mov ecx, 6
-mov eax, [array1+ecx*4] ; 7th element
+fld qword [array1+ecx*8] ; 7th element
 mov ecx, 5
-mov ebx, [array1+ecx*4] ; 6th element
-mul ebx			; 7th * 6th in eax
-
-
-mov ebx, [b]
-sub ebx, eax
-mov [b], ebx
-
-
-
-;---------
+fmul qword [array1+ecx*8] ; 6th element 
+fstp qword [b]
 
 mov ecx, 3
-mov eax, [array1+ecx*4] ; 4th element
-mov ecx, 7
-mov ebx, [array1+ecx*4] ; 8th element
-mul ebx			; 4th * 8th in eax
+fld qword [array1+ecx*8] ; 4th element
+mov ecx, 8
+fmul qword [array1+ecx*8] ; 9th element
 
-mov [c], eax
+fsub qword[b]
+fstp qword [b]
+;-----------------
 
 mov ecx, 6
-mov eax, [array1+ecx*4] ; 7th element
+fld qword [array1+ecx*8] ; 7th element
 mov ecx, 4
-mov ebx, [array1+ecx*4] ; 5th element
-mul ebx			; 7th * 5th in eax
+fmul qword [array1+ecx*8] ; 5th element 
+fstp qword [c]
 
-mov ebx, [c]
-sub ebx, eax
-mov [c], ebx
+mov ecx, 3
+fld qword [array1+ecx*8] ; 4th element
+mov ecx, 7
+fmul qword [array1+ecx*8] ; 8th element
 
-;------------------------------------
-
-
-
-mov eax, [array1]
-mov ebx, [a]
-mul ebx;
-mov [a], eax
+fsub qword[c]
+fstp qword [c]
+;------------------------------------------
 
 
-mov eax, [array1+4]
-mov ebx, [b]
-mul ebx;
-mov [b], eax
+fld qword[a]
+fmul qword[array1]
+fstp qword [a]
+
+fld qword[b]
+fmul qword[array1+8]
+fstp qword [b]
+
+fld qword[c]
+fmul qword[array1+16]
+fstp qword [c]
+
+;-----------------------------------------
 
 
-mov eax, [array1+8]
-mov ebx, [c]
-mul ebx;
-mov [c], eax
+fld qword[a]
+fsub qword[b]
+fadd qword[c]
+fstp qword[detval]
+
+cmp dword [detval+4], 0
+je detiszero
 
 
-
-;---------------
-
-mov eax, [a]
-mov ebx, [b]
-sub eax, ebx
-mov ebx, [c]
-add eax, ebx
-mov [a], eax
-mov [detval], eax
-
-push eax
+push dword [detval+4];
+push dword [detval];
 push formatdet;
 call printf
-add esp, 8 ; remove parameters
+add esp, 12
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;; mat determinant over ;;;;;;;;;;;;;;;
 
-
-
-;;;;;;;;;;;;;;;;;;; Creating transpose ;;;;;;;;;;;;;
-
- mov ebx, 0; 
- mov eax, [array1+ebx*4]
- mov [array2+ebx*4], eax
+;;;;;;;;;;;;;;;;;;;;;;;;;;; creating tranpose ;;;;;;;;;;;;;;;;;;
+ mov ebx, 0;
+ fld qword [array1+ebx*8]
+ fstp qword [array2+ebx*8]
 
  mov ebx, 1
- mov eax, [array1+ebx*4]
+ fld qword [array1+ebx*8]
  mov ebx, 3
- mov [array2+ebx*4], eax
+ fstp qword [array2+ebx*8]
 
  mov ebx, 2
- mov eax, [array1+ebx*4]
+ fld qword [array1+ebx*8]
  mov ebx, 6
- mov [array2+ebx*4], eax
+ fstp qword [array2+ebx*8]
 
  mov ebx, 3
- mov eax, [array1+ebx*4]
+ fld qword [array1+ebx*8]
  mov ebx, 1
- mov [array2+ebx*4], eax
+ fstp qword [array2+ebx*8]
 
  mov ebx, 3
- mov eax, [array1+ebx*4]
+ fld qword [array1+ebx*8]
  mov ebx, 1
- mov [array2+ebx*4], eax
+ fstp qword [array2+ebx*8]
 
  mov ebx, 4
- mov eax, [array1+ebx*4]
- mov [array2+ebx*4], eax
+ fld qword [array1+ebx*8]
+ fstp qword [array2+ebx*8]
 
  mov ebx, 5
- mov eax, [array1+ebx*4]
+ fld qword [array1+ebx*8]
  mov ebx, 7
- mov [array2+ebx*4], eax
+ fstp qword [array2+ebx*8]
 
  mov ebx, 6
- mov eax, [array1+ebx*4]
+ fld qword [array1+ebx*8]
  mov ebx, 2
- mov [array2+ebx*4], eax
+ fstp qword [array2+ebx*8]
 
  mov ebx, 7
- mov eax, [array1+ebx*4]
+ fld qword [array1+ebx*8]
  mov ebx, 5
- mov [array2+ebx*4], eax
+ fstp qword [array2+ebx*8]
 
  mov ebx, 8
- mov eax, [array1+ebx*4]
- mov [array2+ebx*4], eax
+ fld qword [array1+ebx*8]
+ fstp qword [array2+ebx*8]
 
-;;;;;;;;;;;;;;;;;;;;; Creating transpose over ;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;; creating transpose over ;;;;;;;;;;;;;;;;;;;;;
 
 
 ;;;;;;;;;;;;;;;;;;;;; getting cofactor ;;;;;;;;;;;;;;;;;;
@@ -235,7 +191,9 @@ pop ebx
 pop ebx
 pop ebx
 mov ecx, 0
-mov [array3+ecx*4], eax
+fstp qword [array3+ecx*8]
+
+
 
 ;---------
 push 5
@@ -249,13 +207,13 @@ pop ebx
 pop ebx
 mov ecx, 1
 
-mov ebx, eax
-mov eax, 0
-sub eax, ebx
+fstp qword [tmp]
+mov dword [fvr], 0
+mov dword [fvr+4], 0
+fld qword [fvr]
+fsub qword [tmp]
 
-mov [array3+ecx*4], eax
-
-
+fstp qword [array3+ecx*8]
 
 ;---------
 push 4
@@ -268,7 +226,7 @@ pop ebx
 pop ebx
 pop ebx
 mov ecx, 2
-mov [array3+ecx*4], eax
+fstp qword [array3+ecx*8]
 
 ;---------
 push 2
@@ -281,10 +239,14 @@ pop ebx
 pop ebx
 pop ebx
 mov ecx, 3
-mov ebx, eax
-mov eax, 0
-sub eax, ebx
-mov [array3+ecx*4], eax
+
+fstp qword [tmp]
+mov dword [fvr], 0
+mov dword [fvr+4], 0
+fld qword [fvr]
+fsub qword [tmp]
+
+fstp qword [array3+ecx*8]
 
 ;---------
 push 2
@@ -297,7 +259,7 @@ pop ebx
 pop ebx
 pop ebx
 mov ecx, 4
-mov [array3+ecx*4], eax
+fstp qword [array3+ecx*8]
 
 ;---------
 push 1
@@ -310,10 +272,14 @@ pop ebx
 pop ebx
 pop ebx
 mov ecx, 5
-mov ebx, eax
-mov eax, 0
-sub eax, ebx
-mov [array3+ecx*4], eax
+
+fstp qword [tmp]
+mov dword [fvr], 0
+mov dword [fvr+4], 0
+fld qword [fvr]
+fsub qword [tmp]
+
+fstp qword [array3+ecx*8]
 
 ;---------
 push 2
@@ -326,7 +292,7 @@ pop ebx
 pop ebx
 pop ebx
 mov ecx, 6
-mov [array3+ecx*4], eax
+fstp qword [array3+ecx*8]
 
 ;---------
 push 2
@@ -339,10 +305,15 @@ pop ebx
 pop ebx
 pop ebx
 mov ecx, 7
-mov ebx, eax
-mov eax, 0
-sub eax, ebx
-mov [array3+ecx*4], eax
+
+
+fstp qword [tmp]
+mov dword [fvr], 0
+mov dword [fvr+4], 0
+fld qword [fvr]
+fsub qword [tmp]
+
+fstp qword [array3+ecx*8]
 
 ;---------
 push 1
@@ -355,77 +326,63 @@ pop ebx
 pop ebx
 pop ebx
 mov ecx, 8
-mov [array3+ecx*4], eax
+fstp qword [array3+ecx*8]
 
 ;;;;;;;;;;;;;;;;;;;;;; getting cofactor over ;;;;;;;;;;;;;
 
-
 ;;;;;;;;;;;;;;;;;;;;; Division by determinant value ;;;;;;;;;;;;;;;
-   mov eax, 9;  
    mov ebx, 0;
-   mov [a], eax;
-   mov [b], ebx; 
-   
-   mov edx, 0	
 
 nextdiv:
-   mov eax, [array3+ebx*4]
-
-a1:
-   mov ecx, [detval]
-   div ecx
-a2:
-   mov [array4+ebx*4], eax
+   fld qword [array3+ebx*8]
+   fdiv qword [detval]
+   fstp qword [array3+ebx*8]
    inc ebx
 
-
-   mov eax, [a]
-   sub eax, 1; 
-   mov [a], eax;   
-   cmp eax, [b];        
-
-   jne nextdiv;
+   cmp ebx, 9
+   jl nextdiv
 
 
 ;;;;;;;;;;;;;;;;;;;;; Division by determinant value over ;;;;;;;;;;;;;;;
 
 
 
-
-
-
-
-
-
-
-;call test
-
-
 ;;;;;;;;;;;;;;;;;;;; Print the mat ;;;;;;;;;;;;;;;;;;;;;
 pmat:
-   mov eax, 9;	
    mov ebx, 0;
-   mov [a], eax;
-   mov [b], ebx; 
-   
+
 printMat:
-   
-l1:
-   push dword [array4+ebx*4];
+
+   push dword [array3+ebx*8+4];
+   push dword [array3+ebx*8];
    push formatout;
    call printf
-   add esp, 8 ; remove parameters
+   add esp, 12 
    inc ebx
+   
+   cmp ebx, 3
+   je wp
 
-l2:
-   mov eax, [a]
-   sub eax, 1; 
-   mov [a], eax;   
-   cmp eax, [b];	
+   cmp ebx, 6
+   je wp
 
-   jne printMat;
-   add esp, 8 ; remove parameters
-;;;;;;;;;;;;;;;;;;;;; Print matrix over ;;;;;;;;;;;;;;;;;;
+cnt:
+   cmp ebx, 9
+   jl printMat
+
+jmp next
+
+
+
+wp:
+   push newline
+   call printf
+   add esp, 4
+   jmp cnt
+
+next:
+;;;;;;;;;;;;;;;;;;;;;;;;; Print matrix over ;;;;;;;;;;;;;;;;;;
+
 
 exit:
 xor ebx, ebx
@@ -433,41 +390,50 @@ mov eax, 1
 int 80h
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; test function ;;;;;;;;;;;;;;;;;;;
-test:
-   mov ebx, [esp+4]
-   push ebx
-   push formatout
-   call printf
-   add esp, 8 ; remove parameters
-ret;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; test function over ;;;;;;;;;;;;;;
+detiszero:
 
+push formatdetzero
+call printf
+add esp, 4
 
-;;;;;;;;;;;;;;;;;;;;;; Finding determinant of minor matrices ;;;;;;;;;;;;;;;;;;
+xor ebx, ebx
+mov eax, 1
+int 80h
+
+;;;;;;;;;;;;;;;;;;;;; Read float value function ;;;;;;;;;;;;;;;;;;;;
+readfloat:
+push ebp
+mov ebp, esp
+sub esp, 8
+lea eax, [esp]
+push eax
+push formatin
+call scanf
+add esp, 8
+fld qword [ebp - 8]
+mov esp, ebp
+pop ebp
+ret
+;;;;;;;;;;;;;;;;;;;; Read float value fuction over ;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;; Finding determinant of minor matrices function ;;;;;;;;;;;;;;;;;;
 getDet:
 
-mov ecx, [esp+4]
-mov eax, [array2+ecx*4] ; top left element
-mov ecx, [esp+8]
-mov ebx, [array2+ecx*4] ; bottom right element
-mul ebx			
-
-mov [a], eax
-
 mov ecx, [esp+12]
-mov eax, [array2+ecx*4] ; bottom left element
+fld qword [array2+ecx*8] ; bottom left element
 mov ecx, [esp+16]
-mov ebx, [array2+ecx*4] ; top right element
-mul ebx		
+fmul qword [array2+ecx*8] ; top right element
+fstp qword [tmp]
 
-mov ebx, [a]
-sub ebx, eax
-mov eax, ebx
+mov ecx, [esp+4]
+fld qword[array2+ecx*8] ; top left element
+mov ecx, [esp+8]
+fmul qword [array2+ecx*8] ; bottom right element
+
+fsub qword[tmp]
 
 ret
 ;----------
-
 
 
 
