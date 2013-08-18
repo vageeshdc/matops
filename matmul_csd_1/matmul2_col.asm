@@ -1,8 +1,9 @@
 ;assignment 1
 ;CSD course
-;author: vageesh
+;author: vageesh,pankaj
 ;
 ;Info : a matrix multiplication implementation
+; This is the column major format .. same code except the way the multiplication is done 
 
 SECTION .data
 	msg: db "sup there",16
@@ -121,6 +122,14 @@ main:
 
 	mov [CHval],edx
 	mov [CLval],eax
+	;CLval and CHval are for storing clock cycles
+
+	
+	;bi,bj are blocks of A bj,bk are the blocks in B
+	;A - iXj and B -jXk
+	;DDD - tmp space
+	;CCC ressult
+	;AAA and BBB are the matrices
 
 	;bj
 	mov eax,30
@@ -162,6 +171,7 @@ main:
 	mov eax,AAA
 	push eax
 
+	;call for the block matrix multiplication
 	call mult_block_2d
 
 print_timer:
@@ -178,10 +188,11 @@ print_timer:
 	mov edx,0
 	push eax
 	;push edx
+	;printing the cycles passed
 	push format3
 	call printf
 
-	;; print the matrix C
+	;; print the matrix CCC the result
 
 	mov eax,10
 	mov [lop_i],eax
@@ -254,21 +265,26 @@ mult_block_2d:
 	;the params are A[],B[],C[],D[],i,k,j,bi,bk,bj
 	; A,B are the ip C is the OP
 	; D is the dummy iX[jXk]
-	; i j k is the dimension
-	; bi bj is the block parameter
+	; i j ,j k is the dimension of A and B
+	; bi bk,bk bj is the block parameter of A and B
 
+	;matrix A
 	mov eax,[esp+4]
 	mov [Av],eax
 
+	;matrix B
 	mov eax,[esp+8]
 	mov [Bv],eax
 
+	;matrix C for solution
 	mov eax,[esp+12]
 	mov [Cv],eax
 
+	;tmp matrix
 	mov eax,[esp+16]
 	mov [Dv],eax
 
+	;indices i , k and j
 	mov eax,[esp+20]
 	mov [i1],eax
 
@@ -278,6 +294,7 @@ mult_block_2d:
 	mov eax,[esp+28]
 	mov [j1],eax
 
+	;blocks bi,bk and bj
 	mov eax,[esp+32]
 	mov [bi],eax
 
@@ -287,6 +304,7 @@ mult_block_2d:
 	mov eax,[esp+40]
 	mov [bj],eax
 
+	;check if the block sizes are multiples
 	mov eax,[i1]
 	mov ecx,[bi]
 	mov edx,0
@@ -315,8 +333,9 @@ mult_block_2d:
 	jne exit_error_noerror
 
 
-	;use lop_i,lop_j,lop_k
-	;ind ia ja ib jb ic jc id jd
+	;use lop_i,lop_j,lop_k as loop indices
+	;ind ia ja ib jb ic jc id jd as the offsets for the blocks
+	;starting loop from the bottom right corner
 	
 	mov eax,0
 	mov [lop_i],eax
@@ -331,8 +350,9 @@ l2:
 	
 l3:
 	
-	;;mult here
+	;;multiplication here here
 	
+	;; the block sizes
 	;bj
 	mov eax,[bj]
 	push eax
@@ -345,6 +365,7 @@ l3:
 	mov eax,[bi]
 	push eax
 
+	;; matrix dims
 	;j
 	mov eax,[j1]
 	push eax
@@ -357,6 +378,7 @@ l3:
 	mov eax,[i1]
 	push eax
 
+	; offsets of C B ans A in order
 	;jc
 	mov eax,0
 	push eax
@@ -382,6 +404,7 @@ l3:
 	mov eax,[lop_i]
 	push eax
 
+	; the matrices
 	;C
 	mov eax,[Dv]
 	push eax
@@ -394,7 +417,7 @@ l3:
 	mov eax,[Av]
 	push eax
 
-	;; call the function
+	;; call the function for multiplication
 	call mult_mat_2d
 
 	;; mult ends
@@ -426,6 +449,7 @@ l3:
 l3_out:
 
 	;; add ops here
+	;; multiplied blocks stored in temp place now added
 	
 	mov eax,0
 	mov [lop_k],eax
@@ -434,6 +458,7 @@ l4:
 
 	;; push ops
 
+	; the block dimension
 	;bj
 	mov eax,[bj]
 	push eax
@@ -442,6 +467,7 @@ l4:
 	mov eax,[bi]
 	push eax
 
+	;arr dimension
 	;j
 	mov eax,[j1]
 	push eax
@@ -450,6 +476,7 @@ l4:
 	mov eax,[i1]
 	push eax
 
+	;offsets
 	;jc
 	mov eax,[lop_j]
 	push eax
@@ -487,7 +514,7 @@ l4:
 	mov eax,[Cv]
 	push eax
 
-	;; call
+	;; call of adding intermediate results
 	call add_mat_2d
 
 	;;end of pushops
@@ -553,17 +580,21 @@ mult_mat_2d:
 	;Wid is the Width of parent matrix
 	;Work under assumption that it is a square
 	; A,B,C are the references of parent matrices only
+	; here this is the colimn major format
 
-
+	; mat a
 	mov eax,[esp+4]
 	mov [av2],eax
 
+	;mat b
 	mov eax,[esp+8]
 	mov [bv2],eax
 
+	; mat c
 	mov eax,[esp+12]
 	mov [cv2],eax
 
+	; the offsets
 	mov eax,[esp+16]
 	mov [ia2],eax
 
@@ -582,6 +613,7 @@ mult_mat_2d:
 	mov eax,[esp+36]
 	mov [jc2],eax
 
+	; the big array dims
 	mov eax,[esp+40]
 	mov [i2],eax
 
@@ -591,6 +623,7 @@ mult_mat_2d:
 	mov eax,[esp+48]
 	mov [j2],eax
 
+	;block sizes
 	mov eax,[esp+52]
 	mov [bi2],eax
 
@@ -600,6 +633,7 @@ mult_mat_2d:
 	mov eax,[esp+60]
 	mov [bj2],eax
 
+	; iterating using the column first
 	mov eax,[bi2]
 	sub eax,1
 	mov dword [loop_j],eax
@@ -644,6 +678,7 @@ out_2:
 
 	;inner loop
 
+	; gettiing B trans
 	;current B off
 	mov eax,[loop_i]
 	imul eax,4
@@ -651,6 +686,7 @@ out_2:
 	add eax,[bOff]
 	mov dword [bVec],eax
 
+	; getting a trans
 	;current A off
 	mov eax,[loop_j]
 	imul eax,[k2]
@@ -660,24 +696,29 @@ out_2:
 	mov dword [aVec],eax
 	
 	;;;row multiplication ops here...
+	; a row and column are multiplied element wise here
 	
+	; this has the result
 	mov ebx,0
 	mov ecx,[bk2]
 	sub ecx,1
 	
 out_3:	
+	;getting the element positions for B
 	mov eax,ecx
 	imul eax,[j2]
 	imul eax,4
 	add dword eax,[bVec]
 	mov edx,[eax]
 
+	; getting element in A
 	mov eax,[aVec]
 	push ecx
 	imul ecx,4
 	add eax,ecx
 	pop ecx
 
+	;multiplication and store
 	imul edx,[eax]
 	add ebx,edx
 	sub ecx,1
@@ -691,9 +732,10 @@ out_3_exit:
 	
 	mov edx,ebx
 
+	; storing as transpose
 	;writing result of C
 	mov eax,[loop_j]
-	imul eax,[j2]
+	imul eax,[i2]
 	mov ebx,[loop_i]
 	add eax,ebx
 	imul eax,4
@@ -739,6 +781,7 @@ add_mat_2d:
 	; A,B,C are the references of parent matrices only
 
 
+	; matrices 
 	mov eax,[esp+4]
 	mov [av2],eax
 
@@ -748,6 +791,7 @@ add_mat_2d:
 	mov eax,[esp+12]
 	mov [cv2],eax
 
+	; the offsets
 	mov eax,[esp+16]
 	mov [ia2],eax
 
@@ -766,12 +810,14 @@ add_mat_2d:
 	mov eax,[esp+36]
 	mov [jc2],eax
 
+	; the arr dimensions
 	mov eax,[esp+40]
 	mov [i2],eax
 
 	mov eax,[esp+44]
 	mov [j2],eax
 
+	;block parameters
 	mov eax,[esp+48]
 	mov [bi2],eax
 
@@ -866,6 +912,7 @@ out_1a_end:
 	;end of addition
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;; NOT needed ;;;;;;;;;;;;;;;;;;;;
 
 trans_mat_2d:
 	;args - A[],i,j,ia,ja,W
