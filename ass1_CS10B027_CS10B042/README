@@ -1,0 +1,37 @@
+CSD assignment 1
+
+Authors: Pankaj Kumar (cs10b042),Vageesh D C(cs10b027)
+
+General compilation:
+1. $ nasm -f elf <file name>
+2. $ gcc -o <executable> <file_name.o>
+3. $ ./<executable>
+
+Running:
+	1. multiplication
+		$ make
+		$ ./matmul_row #for row major
+		$ ./matmul_col #for column major
+		$ clean
+
+	2.inverse
+		$ make
+		$ ./inverse
+		$ clean
+
+Usage:
+1. Matrix multiplication:
+	The matrices values must be filled into the variables corresponding to AAA, BBB for matrices A and B respectively - hardcoded
+	The executable produced runs without any input but outputs the cycles elapsed for computation and the resultant matrix
+	Output to stdout in integer base 10
+	Runtime: 162040 cycles for row major and 122352 for col major
+
+2. Inverse:
+	This requires the user to input a 3x3 matrix in row major form by entering the elements one after another - input via stdin
+	The inverse is printed out to stdout in base 10
+	Runtime: 118348 cycles
+
+Work division:
+	1. Matrix multiplication: Row major implemented by Vageesh and column major by Pankaj
+	2. Inverse implemented by Pankaj and Vageesh
+	3. The design was discussed and implemented together
