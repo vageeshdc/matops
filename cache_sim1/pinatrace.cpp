@@ -258,7 +258,7 @@ public:
 
 
     bool read_c_(int address) {      
-        if(exists(address)) {
+        if(exists(address) && has_valid_data(address)) {
             logger::log_event(hit, read_ops, this->id);
 	    replacement_update(address);
             return true;
@@ -269,6 +269,25 @@ public:
     }
 
 // Tries to write
+    bool has_valid_data(int address){
+	int idx;
+	int add_idx = get_index(address);
+	int add_tag = get_tag(address);
+	
+	for(idx = 0;idx < associativity;idx++){
+	    
+	    if(entries[add_idx][idx].tag == add_tag){
+		if(entries[add_idx][idx].valid){
+		    return true;
+		}
+		else{
+		    return false;
+		}
+	    }
+	}
+	
+	return false;
+    }
 
     bool write_c_(int address) {
         if(exists(address)) {
@@ -370,6 +389,14 @@ public:
 		return newBlock;
 	    }
 	}
+	else{
+	    cache_entry dummy_var;
+	    dummy_var.dirty = false;
+	    dummy_var.valid = true;
+	    dummy_var.LRU = 0;
+	    dummy_var.tag = 0;
+	    return dummy_var;
+	}
     }
     
     cache_entry get_block(int address){
@@ -386,6 +413,14 @@ public:
 		}
 	    }
 	}
+	
+	//dummy piece
+	cache_entry dummy_var;
+	dummy_var.dirty = false;
+	dummy_var.valid = true;
+	dummy_var.LRU = 0;
+	dummy_var.tag = 0;
+	return dummy_var;
     }
     
     void put_block(int address,cache_entry new_blk){
@@ -424,19 +459,45 @@ public:
 
 };
 
-
 FILE * trace;
+
+vector<cache*> main_cache;
+main_memory* ram_mem;
+
+void read_build_cache(FILE* ip_data){
+    
+    //TODO: all this from file pointer
+    
+    main_cache.push_back(new cache(32,0,32*1024,32,4,LRU));
+    main_cache.push_back(new cache(32,1,64*1024,32,8,LRU));
+    
+    main_cache[0]->nextLevel = main_cache[1];
+    main_cache[0]->hasLevel = true;
+    
+    main_cache[1]->topLevel = ram_mem;
+    main_cache[1]->hasLevel = false;
+    
+    ram_mem = new main_memory(0,0,0,0);
+}
+
 
 // Print a memory read record
 VOID RecordMemRead(VOID * ip, VOID * addr)
 {
     fprintf(trace,"%p: R %p\n", ip, addr);
+    
+    cache_entry tmp_bk;
+    tmp_bk = main_cache[0]->return_block_read((int)ip);
+    tmp_bk = main_cache[0]->return_block_read((int)addr);
 }
 
 // Print a memory write record
 VOID RecordMemWrite(VOID * ip, VOID * addr)
 {
     fprintf(trace,"%p: W %p\n", ip, addr);
+    
+    main_cache[0]->write_c_((int)ip);
+    main_cache[0]->write_c_((int)addr);
 }
 
 // Is called for every instruction and instruments reads and writes
@@ -497,6 +558,11 @@ INT32 Usage()
 
 int main(int argc, char *argv[])
 {
+    //assuming this is the input file
+    FILE* cachce_set_param = fopen("cache_data.in","r");
+    
+    read_build_cache(cachce_set_param);
+  
     if (PIN_Init(argc, argv)) return Usage();
 
     trace = fopen("pinatrace.out", "w");
