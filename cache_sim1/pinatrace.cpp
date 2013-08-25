@@ -62,11 +62,11 @@ struct cache_entry {
 class logger {
 
 public: 
-    static vector<cache_event> event_log;// says if hit/miss
-    static vector<int> eve_level; // says where it occured
-    static vector<int> event_cost; //cost of an event
-    static vector<cache_op> cac_op; // what operation - read/write
-    static int cache_levels; // specify the levels of cache
+    vector<cache_event> event_log;// says if hit/miss
+    vector<int> eve_level; // says where it occured
+    vector<int> event_cost; //cost of an event
+    vector<cache_op> cac_op; // what operation - read/write
+    int cache_levels; // specify the levels of cache
 
 //default constructor
 
@@ -75,7 +75,7 @@ public:
         cache_levels = levels;
     }
     
-    static void set_params(vector<int> costs,int levels) {
+    void set_params(vector<int> costs,int levels) {
 
         event_cost = costs;
         cache_levels = levels;
@@ -83,30 +83,30 @@ public:
 
 // the event handler
 
-    static void log_event(cache_event c_eve,cache_op c_op,int c_level) {
+    void log_event(cache_event c_eve,cache_op c_op,int c_level) {
 
-        eve_level.push_back(c_level); //pushing the cache where the event occured
-        cac_op.push_back(c_op); // what cache operation
-        event_log.push_back(c_eve); // hit/miss
+        this->eve_level.push_back(c_level); //pushing the cache where the event occured
+        this->cac_op.push_back(c_op); // what cache operation
+        this->event_log.push_back(c_eve); // hit/miss
     }
 
     //print function
-    static void print_event(FILE* fp) {
+    void print_event(FILE* fp) {
 	// analytics here this is variable to situation
 	int c_event_log[] = {0,0,0,0};
 
 	int i = 0;
-	for(i = 0;i < (int)event_log.size();i++){
-	    if((event_log[i] == hit)&&(eve_level[i] == 1)){
+	for(i = 0;i < (int)this->event_log.size();i++){
+	    if((this->event_log[i] == hit)&&(this->eve_level[i] == 1)){
 		c_event_log[0]++;
 	    }
-	    else if((event_log[i] == miss)&&(eve_level[i] == 1)){
+	    else if((this->event_log[i] == miss)&&(this->eve_level[i] == 1)){
 		c_event_log[1]++;
 	    }
-	    else if((event_log[i] == hit)&&(eve_level[i] == 2)){
+	    else if((this->event_log[i] == hit)&&(this->eve_level[i] == 2)){
 		c_event_log[2]++;
 	    }
-	    else if((event_log[i] == miss)&&(eve_level[i] == 2)){
+	    else if((this->event_log[i] == miss)&&(this->eve_level[i] == 2)){
 		c_event_log[3]++;
 	    }
 	}
@@ -134,6 +134,7 @@ public:
     int parallel_ops; // the parallen ops
     int address_size; // the address width
     int level_value;
+    logger* log_elem;
 
     main_memory(int size,int bus_size,int address_size,int level_val) {
 
@@ -146,13 +147,13 @@ public:
 
     void read_c_(int address,int data) {
         //implement read here
-        logger:: log_event(hit,read_ops,level_value);
+        log_elem->log_event(hit,read_ops,level_value);
     }
 
     void write_c_(int address,int data) {
         // implement a write here
         //must call an observer class here
-        logger:: log_event(hit,write_ops,level_value);
+        log_elem->log_event(hit,write_ops,level_value);
     }
     
 };
@@ -189,6 +190,7 @@ public:
     bool hasLevel;
     cache* nextLevel;
     main_memory* topLevel;
+    logger* log_elem;
 
     cache(int address_size,int id, int size, int block_size, int associativity, Replacement_Policy rp) {
 
@@ -259,11 +261,11 @@ public:
 
     bool read_c_(int address) {      
         if(exists(address) && has_valid_data(address)) {
-            logger::log_event(hit, read_ops, this->id);
+            log_elem->log_event(hit, read_ops, this->id);
 	    replacement_update(address);
             return true;
         } else {
-            logger::log_event(miss, read_ops, this->id);
+            log_elem->log_event(miss, read_ops, this->id);
             return false;
         }
     }
@@ -291,12 +293,12 @@ public:
 
     bool write_c_(int address) {
         if(exists(address)) {
-            logger::log_event(hit, write_ops, this->id);
+            log_elem->log_event(hit, write_ops, this->id);
 	    replacement_update(address);
             setDirtyBit(address,true);
             return true;
         } else {
-            logger::log_event(miss, write_ops, this->id);
+            log_elem->log_event(miss, write_ops, this->id);
 	     //kick out a block and put new one
 	    
 	    read_flag = false;
@@ -463,21 +465,33 @@ FILE * trace;
 
 vector<cache*> main_cache;
 main_memory* ram_mem;
+logger* cap_eve_log;
 
 void read_build_cache(FILE* ip_data){
     
     //TODO: all this from file pointer
+    vector<int> costs;
+    costs.push_back(4);
+    costs.push_back(16);
+    costs.push_back(16);
+    costs.push_back(200);
+    
+    cap_eve_log = new logger(costs,3);
     
     main_cache.push_back(new cache(32,0,32*1024,32,4,LRU));
     main_cache.push_back(new cache(32,1,64*1024,32,8,LRU));
     
+    ram_mem = new main_memory(0,0,0,0);
+    ram_mem->level_value = 2;
+    ram_mem->log_elem = cap_eve_log;
+    
     main_cache[0]->nextLevel = main_cache[1];
     main_cache[0]->hasLevel = true;
+    main_cache[0]->log_elem = cap_eve_log;
     
     main_cache[1]->topLevel = ram_mem;
     main_cache[1]->hasLevel = false;
-    
-    ram_mem = new main_memory(0,0,0,0);
+    main_cache[1]->log_elem = cap_eve_log;
 }
 
 
