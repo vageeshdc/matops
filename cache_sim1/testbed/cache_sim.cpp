@@ -1,8 +1,3 @@
-/*
- *  Authors: Vageesh D C, Pankaj Kumar
- *  This file contains an ISA-portable PIN tool for tracing memory accesses.
- */
-#include "pin.H"
 #include <stdio.h>
 #include <vector>
 #include <iostream>
@@ -474,103 +469,37 @@ void read_build_cache(FILE* ip_data){
     main_cache[1]->log_elem = cap_eve_log;
 }
 
-// Print a memory read record
-VOID RecordMemRead(VOID * ip, VOID * addr)
-{
-    fprintf(trace,"%p: R %p\n", ip, addr);
+int main(){
+  
+    cachce_set_param = fopen("pinatrace.out","r");
+    cachce_write_param = fopen("cache_result.in","w");
+    read_build_cache(cachce_set_param);
     
-    cache_entry tmp_bk;
-    tmp_bk = main_cache[0]->return_block_read((int)ip);
-    tmp_bk = main_cache[0]->return_block_read((int)addr);
-}
-
-// Print a memory write record
-VOID RecordMemWrite(VOID * ip, VOID * addr)
-{
-    fprintf(trace,"%p: W %p\n", ip, addr);
+    //reading part
+    int add1,add2;
+    char charVal;
+    int ctr_idx = 0;
     
-    cache_entry tmp_bk;
-    tmp_bk = main_cache[0]->return_block_read((int)ip);
-    main_cache[0]->write_c_((int)addr);
-}
+    while(ctr_idx < 212989){
+	
+	fscanf(cachce_set_param,"%x%c%x",&add1,&charVal,&add2);
+	cache_entry tmp_bk;
+	tmp_bk = main_cache[0]->return_block_read(add1);
+	
+	if(charVal == 'W'){
+	    main_cache[0]->write_c_((int)add2);
+	}
+	else{
+	    tmp_bk = main_cache[0]->return_block_read((int)add2);
+	}
 
-// Is called for every instruction and instruments reads and writes
-VOID Instruction(INS ins, VOID *v)
-{
-    // Instruments memory accesses using a predicated call, i.e.
-    // the instrumentation is called iff the instruction will actually be executed.
-    //
-    // On the IA-32 and Intel(R) 64 architectures conditional moves and REP 
-    // prefixed instructions appear as predicated instructions in Pin.
-    UINT32 memOperands = INS_MemoryOperandCount(ins);
-
-    // Iterate over each memory operand of the instruction.
-    for (UINT32 memOp = 0; memOp < memOperands; memOp++)
-    {
-        if (INS_MemoryOperandIsRead(ins, memOp))
-        {
-            INS_InsertPredicatedCall(
-                ins, IPOINT_BEFORE, (AFUNPTR)RecordMemRead,
-                IARG_INST_PTR,
-                IARG_MEMORYOP_EA, memOp,
-                IARG_END);
-        }
-        // Note that in some architectures a single memory operand can be 
-        // both read and written (for instance incl (%eax) on IA-32)
-        // In that case we instrument it once for read and once for write.
-        if (INS_MemoryOperandIsWritten(ins, memOp))
-        {
-            INS_InsertPredicatedCall(
-                ins, IPOINT_BEFORE, (AFUNPTR)RecordMemWrite,
-                IARG_INST_PTR,
-                IARG_MEMORYOP_EA, memOp,
-                IARG_END);
-        }
+	cout<<ctr_idx<<"\n";
+	ctr_idx++;
     }
-}
-
-VOID Fini(INT32 code, VOID *v)
-{
-    cap_eve_log->print_event(cachce_write_param);
-    fprintf(trace, "#eof\n");
     
-    fclose(trace);
+    cap_eve_log->print_event(cachce_write_param);
     fclose(cachce_write_param);
     fclose(cachce_set_param);
-}
-
-/* ===================================================================== */
-/* Print Help Message                                                    */
-/* ===================================================================== */
-   
-INT32 Usage()
-{
-    PIN_ERROR( "This Pintool prints a trace of memory addresses\n" 
-              + KNOB_BASE::StringKnobSummary() + "\n");
-    return -1;
-}
-
-/* ===================================================================== */
-/* Main                                                                  */
-/* ===================================================================== */
-
-int main(int argc, char *argv[])
-{
-    //assuming this is the input file
-    cachce_set_param = fopen("cache_data.in","r");
-    cachce_write_param = fopen("cache_result.in","w");
-    
-    read_build_cache(cachce_set_param);
-  
-    if (PIN_Init(argc, argv)) return Usage();
-
-    trace = fopen("pinatrace.out", "w");
-
-    INS_AddInstrumentFunction(Instruction, 0);
-    PIN_AddFiniFunction(Fini, 0);
-
-    // Never returns
-    PIN_StartProgram();
     
     return 0;
 }
