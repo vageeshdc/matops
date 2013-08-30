@@ -1,0 +1,13 @@
+Matrix dimensions and the results files
+
+Here the result files are in the form <name>.txt
+
+============:==========================:
+   name     :    dimension of matrices :
+============:==========================:
+ row | col  :       10*20 20*30        :
+row1 | col1 :       20*40 40*60        :
+row2 | col2 :       40*80 80*120       : 
+row3 | col3 :       40*120 120*240     :
+============:==========================:
+
