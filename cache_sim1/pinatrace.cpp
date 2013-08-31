@@ -461,6 +461,9 @@ void read_build_cache(FILE* ip_data){
     
     main_cache.push_back(new cache(32,0,32*1024,32,4,LRU));
     main_cache.push_back(new cache(32,1,64*1024,32,8,LRU));
+	main_cache.push_back(new cache(32,2,128*1024,32,8,LRU));// modify this assignment for dynamic cache creation using config fiel
+	// XXX:also do update the logger to decide how many levels it must go.. we can have a global variable to decide how ,many cache levels are there
+	// TODO :then we have a generic method to do the above and below allocations in a loop!!
     
     ram_mem = new main_memory(1024,32,32,2);
     ram_mem->log_elem = cap_eve_log;
