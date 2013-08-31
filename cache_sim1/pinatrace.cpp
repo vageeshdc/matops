@@ -71,16 +71,16 @@ public:
 	    fprintf(stderr,"yo!\n");
 	    
 	    for(i = 0;i < (int)this->event_log.size();i++){
-		if((this->event_log[i] == hit)&&(this->eve_level[i] == 1)){
+		if((this->event_log[i] == hit)&&(this->eve_level[i] == 0)){
 		    c_event_log[0]++;
 		}
-		else if((this->event_log[i] == miss)&&(this->eve_level[i] == 1)){
+		else if((this->event_log[i] == miss)&&(this->eve_level[i] == 0)){
 		    c_event_log[1]++;
 		}
-		else if((this->event_log[i] == hit)&&(this->eve_level[i] == 2)){
+		else if((this->event_log[i] == hit)&&(this->eve_level[i] == 1)){
 		    c_event_log[2]++;
 		}
-		else if((this->event_log[i] == miss)&&(this->eve_level[i] == 2)){
+		else if((this->event_log[i] == miss)&&(this->eve_level[i] == 1)){
 		    c_event_log[3]++;
 		}
 	    }
@@ -480,7 +480,7 @@ VOID RecordMemRead(VOID * ip, VOID * addr)
     fprintf(trace,"%p: R %p\n", ip, addr);
     
     cache_entry tmp_bk;
-    tmp_bk = main_cache[0]->return_block_read((int)ip);
+    //p_bk = main_cache[0]->return_block_read((int)ip);
     tmp_bk = main_cache[0]->return_block_read((int)addr);
 }
 
@@ -489,9 +489,17 @@ VOID RecordMemWrite(VOID * ip, VOID * addr)
 {
     fprintf(trace,"%p: W %p\n", ip, addr);
     
-    cache_entry tmp_bk;
-    tmp_bk = main_cache[0]->return_block_read((int)ip);
+    //cache_entry tmp_bk;
+    //p_bk = main_cache[0]->return_block_read((int)ip);
     main_cache[0]->write_c_((int)addr);
+}
+
+// Print a ins access
+VOID RecordInsRead(VOID * ip){
+	fprintf(trace,"%p\n",ip);
+
+	cache_entry tmp_bk;
+    tmp_bk = main_cache[0]->return_block_read((int)ip);
 }
 
 // Is called for every instruction and instruments reads and writes
@@ -502,6 +510,11 @@ VOID Instruction(INS ins, VOID *v)
     //
     // On the IA-32 and Intel(R) 64 architectures conditional moves and REP 
     // prefixed instructions appear as predicated instructions in Pin.
+	
+	//getting the instruction address
+	INS_InsertPredicatedCall(ins,IPOINT_BEFORE,(AFUNPTR)RecordInsRead,IARG_INST_PTR,IARG_END);
+
+	//getting memory ops
     UINT32 memOperands = INS_MemoryOperandCount(ins);
 
     // Iterate over each memory operand of the instruction.

@@ -1,6 +1,6 @@
-L1 hits: 11376215 
-L1 miss: 433593 
-L2 hits: 287181 
-L2 miss: 146412 
-L1 miss ratio: 3 
-L2 miss ratio: 33 
+L1 hits: 16921487 
+L1 miss: 507996 
+L2 hits: 341277 
+L2 miss: 166719 
+L1 miss ratio: 2 
+L2 miss ratio: 32 
