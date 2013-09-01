@@ -9,6 +9,10 @@
 #include <stdio.h>
 #include <vector>
 #include <math.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -27,6 +31,14 @@ struct cache_entry {
     bool valid;
 };
 
+	typedef struct _cache_info{
+		int level;
+		int size;
+		int ass;
+		int blocksize;
+		int hl;
+		string rp;
+	} cache_info;
 //implementing the logger class
 
 class logger {
@@ -442,41 +454,124 @@ public:
 };
 
 FILE * trace;
-FILE* cachce_set_param;
+//FILE* cachce_set_param;
 FILE* cachce_write_param;
 vector<cache*> main_cache;
 main_memory* ram_mem;
 logger* cap_eve_log;
 
-void read_build_cache(FILE* ip_data){
+void read_build_cache(ifstream& infile){
     
-    //TODO: all this from file pointer
     vector<int> costs;
-    costs.push_back(4);
-    costs.push_back(16);
-    costs.push_back(16);
-    costs.push_back(200);
-    
-    cap_eve_log = new logger(costs,3);
-    
-    main_cache.push_back(new cache(32,0,32*1024,32,4,LRU));
-    main_cache.push_back(new cache(32,1,64*1024,32,8,LRU));
-	main_cache.push_back(new cache(32,2,128*1024,32,8,LRU));// modify this assignment for dynamic cache creation using config fiel
-	// XXX:also do update the logger to decide how many levels it must go.. we can have a global variable to decide how ,many cache levels are there
-	// TODO :then we have a generic method to do the above and below allocations in a loop!!
-    
-    ram_mem = new main_memory(1024,32,32,2);
-    ram_mem->log_elem = cap_eve_log;
-    
-    main_cache[0]->nextLevel = main_cache[1];
-    main_cache[0]->hasLevel = true;
-    main_cache[0]->log_elem = cap_eve_log;
-    
-    main_cache[1]->topLevel = ram_mem;
-    main_cache[1]->hasLevel = false;
-    main_cache[1]->log_elem = cap_eve_log;
-}
+    //TODO: all this from file pointer
+    string line, tmp, lhs, rhs;
+	string token= "=";
+    int level;
+    int memlatency;
+    stringstream ss;
+    stringstream trimmer;
+//    getline(infile, line);	
 
+
+
+	vector<cache_info> cinfo;	
+	cache_info tmpcinfo;
+
+
+    while(getline(infile, line))
+{
+    if(line.find("Level")!=string::npos)
+    {
+	ss.str( std::string() );
+	ss.clear();
+	ss << line[line.size()-2];
+	ss >> level;
+//	cout<<"level: "<<level<<endl;	
+	tmpcinfo.level = level;
+	for(int i =0; i<5; i++)
+	{
+		ss.str( std::string() );
+		ss.clear();
+		getline(infile, line);
+    		if(line.find("Size")!=string::npos)
+		{
+			ss << line.substr(line.find("=")+1, (line.size()-3)-line.find("="));
+			ss >> tmpcinfo.size;
+//			cout << "size is: "<< tmpcinfo.size<<endl;
+		}	
+    		else if(line.find("Associativity")!=string::npos)
+		{
+			ss << line.substr(line.find("=")+1, (line.size()-1)-line.find("="));
+			ss >> tmpcinfo.ass;
+//			cout << "Associativiy is: "<< tmpcinfo.ass<<endl;
+		}	
+    		else if(line.find("Block")!=string::npos)
+		{
+			ss << line.substr(line.find("=")+1, line.size()-6-line.find("="));
+			ss >> tmpcinfo.blocksize;
+//			cout << "Block size is: "<< tmpcinfo.blocksize<<endl;
+		}	
+    		else if(line.find("Hit")!=string::npos)
+		{
+			ss << line.substr(line.find("=")+1, (line.size()-1)-line.find("="));
+			ss >> tmpcinfo.hl;
+			costs.push_back(tmpcinfo.hl);
+//			cout << "Hit is: "<< tmpcinfo.hl<<endl;
+		}	
+    		else if(line.find("Replacement")!=string::npos)
+		{
+			ss << line.substr(line.find("=")+1, (line.size()-1)-line.find("="));
+			ss >> tmpcinfo.rp;
+//			cout << "Replacement policy is: "<< tmpcinfo.rp<<endl;
+		}	
+
+	}
+	getline(infile, line);
+    	main_cache.push_back(new cache(32,level-1,tmpcinfo.size*1024,tmpcinfo.blocksize,tmpcinfo.ass,LRU));
+    }
+    else
+    {
+	ss.str( std::string() );
+	ss.clear();
+	getline(infile, line);
+	ss << line.substr(line.find("=")+1, (line.size()-1)-line.find("="));
+	ss >> memlatency;
+//	cout <<"memlatency: "<<memlatency<<endl;
+	
+    }
+
+}
+    
+    
+//    costs.push_back(4);
+//    costs.push_back(16);
+//    costs.push_back(16);
+//    costs.push_back(200);		
+    
+    cap_eve_log = new logger(costs, level+1);
+    
+//    main_cache.push_back(new cache(32,0,32*1024,32,4,LRU));
+//    main_cache.push_back(new cache(32,1,64*1024,32,8,LRU));
+    
+    ram_mem = new main_memory(1024,32,32,level);
+    ram_mem->log_elem = cap_eve_log;
+    for(int i=0; i<(int)main_cache.size(); i++){
+
+	if(i!=(int)main_cache.size()-1){
+	    	main_cache[i]->nextLevel = main_cache[i+1];
+    		main_cache[i]->hasLevel = true;
+	    	main_cache[i]->log_elem = cap_eve_log;
+	}else{
+	    	main_cache[i]->topLevel = ram_mem;
+    		main_cache[i]->hasLevel = false;
+	    	main_cache[i]->log_elem = cap_eve_log;
+
+	}
+
+
+	}
+	infile.close();  
+}
 // Print a memory read record
 VOID RecordMemRead(VOID * ip, VOID * addr)
 {
@@ -552,7 +647,7 @@ VOID Fini(INT32 code, VOID *v)
     
     fclose(trace);
     fclose(cachce_write_param);
-    fclose(cachce_set_param);
+    //fclose(cachce_set_param);
 }
 
 /* ===================================================================== */
@@ -573,10 +668,16 @@ INT32 Usage()
 int main(int argc, char *argv[])
 {
     //assuming this is the input file
-    cachce_set_param = fopen("cache_data.in","r");
+    //cachce_set_param = fopen("cache_data.in","r");
     cachce_write_param = fopen("cache_result.in","w");
     
-    read_build_cache(cachce_set_param);
+    ifstream infile;
+    infile.open ("cache_data.in");
+
+    
+    
+ //   read_build_cache(cachce_set_param);
+    read_build_cache(infile);
   
     if (PIN_Init(argc, argv)) return Usage();
 
