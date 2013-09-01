@@ -1,0 +1,25 @@
+==================================================
+CSD - cache simulation
+Authors: Vageesh D C,Pankaj Kumar
+==================================================
+
+A multi level cache architecture for a single core processor is simulated here
+The cache contains both ins and data and is a write back - allocate and non inclusive.
+
+==================================================
+
+Compilations:
+1.THe file pinatrace.cpp must be placed in $PIN_HOME/source/tools/ManualExample and be compiled with the makefile given here
+2. $ make -f makefile2 clean
+   $ make -f makefile2
+   
+Simulation :
+$ sudo ./pin -t source/tools/ManualExample/obj-32ia/pinatrace.so -- <binary>
+
+Necessary files : cache_input.in -- the config file
+Output files    : pinatrace.out -- the memory dump for debug
+                  cache_result.in -- the hit values.
+
+=================================================
+Other files:
+result/ -- results of simulation over different matrice's for multiplication
